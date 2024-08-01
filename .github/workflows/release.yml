@@ -1,0 +1,65 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number'
+        required: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create build and release directories
+        run: | 
+          mkdir -p build
+          mkdir -p release
+      - name: Download Android APK Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/
+      - name: Download iOS IPA Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-ipa
+          path: build/ios/iphoneos/
+      - name: Download Web Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build
+          path: build/web
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux/x64/release/bundle
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-build
+          path: build/macos/Build/Products/Release/
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows/x64/runner/Release/
+      - name: Zip Android APKs
+        run: zip -r release/android-apk.zip build/app/outputs/flutter-apk/
+      - name: Zip iOS IPA
+        run: zip release/ios-ipa.zip build/ios/iphoneos/app.ipa
+      - name: Zip Web Artifacts
+        run: zip -r release/web-build.zip build/web/
+      - name: Zip Linux Artifacts
+        run: zip -r release/linux-build.zip build/linux/x64/release/bundle/
+      - name: Zip macOS Artifacts
+        run: zip -r release/macos-build.zip build/macos/Build/Products/Release/
+      - name: Zip Windows Artifacts
+        run: zip -r release/windows-build.zip build/windows/x64/runner/Release/
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/*
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}

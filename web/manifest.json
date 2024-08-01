@@ -1,6 +1,6 @@
 {
-    "name": "flutter_application",
-    "short_name": "flutter_application",
+    "name": "universal_organizer",
+    "short_name": "universal_organizer",
     "start_url": ".",
     "display": "standalone",
     "background_color": "#0175C2",
