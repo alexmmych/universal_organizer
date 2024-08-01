@@ -144,18 +144,19 @@ jobs:
     steps:
       - uses: actions/checkout@v3
       - name: Create build and release directories
-        run: mkdir -p build
-        run: mkdir -p release
+        run: | 
+          mkdir -p build
+          mkdir -p release
       - name: Download Android APK Artifacts
         uses: actions/download-artifact@v3
         with:
           name: android-apk
-          path: build/android
+          path: build/app/outputs/flutter-apk/
       - name: Download iOS IPA Artifacts
         uses: actions/download-artifact@v3
         with:
           name: ios-ipa
-          path: build/ios
+          path: build/ios/iphoneos/
       - name: Download Web Artifacts
         uses: actions/download-artifact@v3
         with:
@@ -165,17 +166,17 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: linux-build
-          path: build/linux
+          path: build/linux/x64/release/bundle
       - name: Download macOS Artifacts
         uses: actions/download-artifact@v3
         with:
           name: macos-build
-          path: build/macos
+          path: build/macos/Build/Products/Release/
       - name: Download Windows Artifacts
         uses: actions/download-artifact@v3
         with:
           name: windows-build
-          path: build/windows
+          path: build/windows/x64/runner/Release/*.exe
       - name: Copy Android APK
         run: cp -r build/app/outputs/flutter-apk/*.apk release/
       - name: Copy iOS IPA
