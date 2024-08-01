@@ -121,6 +121,7 @@ jobs:
       - name: Gather Artifacts
         run: |
           cd ${{ github.workspace }}
+          cd ..
           pwd
           ls
           mkdir -p release
