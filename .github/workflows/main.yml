@@ -1,0 +1,196 @@
+name: Build & Release
+
+on:
+  pull_request:
+    branches:
+      - main
+      - master
+  push:
+    branches:
+      - main
+      - master
+      - develop
+
+jobs:
+  build-android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "11"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build apk --release --split-per-abi
+      - name: Upload APK Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: android-apk
+          path: build/app/outputs/flutter-apk/*.apk
+
+  build-ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-java@v3
+        with:
+          distribution: "zulu"
+          java-version: "11"
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build ios --no-codesign
+      - run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cd Payload
+          ln -s ../Runner.app
+          cd ..
+          zip -r app.ipa Payload
+      - name: Upload IPA Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: ios-ipa
+          path: build/ios/iphoneos/app.ipa
+
+  build-web:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build web
+      - name: Upload Web Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: build/web
+
+  build-linux:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            pkg-config \
+            clang \
+            ninja-build \
+            libgtk-3-dev \
+            libblkid-dev \
+            liblzma-dev \
+            liblz4-dev \
+            libssl-dev \
+            libprotobuf-dev \
+            protobuf-compiler
+      - run: flutter pub get
+      - run: flutter build linux
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux/x64/release/bundle
+
+  build-macos:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build macos
+      - name: Upload macOS Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: macos-build
+          path: build/macos/Build/Products/Release/*.app
+
+  build-windows:
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v3
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+      - run: flutter build windows
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows/x64/runner/Release/*.exe
+
+  release:
+    runs-on: ubuntu-latest
+    needs: [build-android, build-ios, build-web, build-linux, build-macos, build-windows]
+    steps:
+      - uses: actions/checkout@v3
+      - name: Create build and release directories
+        run: mkdir -p build
+        run: mkdir -p release
+      - name: Download Android APK Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: android-apk
+          path: build/android
+      - name: Download iOS IPA Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: ios-ipa
+          path: build/ios
+      - name: Download Web Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: web-build
+          path: build/web
+      - name: Download Linux Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux
+      - name: Download macOS Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: macos-build
+          path: build/macos
+      - name: Download Windows Artifacts
+        uses: actions/download-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows
+      - name: Copy Android APK
+        run: cp -r build/app/outputs/flutter-apk/*.apk release/
+      - name: Copy iOS IPA
+        run: cp build/ios/iphoneos/app.ipa release/
+      - name: Copy Web Artifacts
+        run: cp -r build/web/* release/
+      - name: Copy Linux Artifacts
+        run: cp -r build/linux/x64/release/bundle/* release/
+      - name: Copy macOS Artifacts
+        run: cp -r build/macos/Build/Products/Release/*.app release/
+      - name: Copy Windows Artifacts
+        run: cp -r build/windows/x64/runner/Release/*.exe release/
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/*
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.RELEASE_TOKEN }}
