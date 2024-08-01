@@ -179,8 +179,8 @@ jobs:
           path: build/windows/x64/runner/Release/
       - name: Zip Android APKs
         run: zip -r release/android-apk.zip build/app/outputs/flutter-apk/
-      - name: Copy iOS IPA
-        run: cp build/ios/iphoneos/app.ipa release/
+      - name: Zip iOS IPA
+        run: zip release/ios-ipa.zip build/ios/iphoneos/app.ipa
       - name: Zip Web Artifacts
         run: zip -r release/web-build.zip build/web/
       - name: Zip Linux Artifacts
@@ -192,6 +192,6 @@ jobs:
       - name: Push to Releases
         uses: ncipollo/release-action@v1
         with:
-          artifacts: release/*.zip
+          artifacts: release/*
           tag: v1.0.${{ github.run_number }}
           token: ${{ secrets.TOKEN }}
