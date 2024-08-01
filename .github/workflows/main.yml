@@ -176,7 +176,7 @@ jobs:
         uses: actions/download-artifact@v3
         with:
           name: windows-build
-          path: build/windows/x64/runner/Release/*.exe
+          path: build/windows/x64/runner/Release/
       - name: Copy Android APK
         run: cp -r build/app/outputs/flutter-apk/*.apk release/
       - name: Copy iOS IPA
