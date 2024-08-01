@@ -194,4 +194,4 @@ jobs:
         with:
           artifacts: release/*
           tag: v1.0.${{ github.run_number }}
-          token: ${{ secrets.RELEASE_TOKEN }}
+          token: ${{ secrets.TOKEN }}
