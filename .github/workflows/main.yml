@@ -120,6 +120,8 @@ jobs:
       - uses: actions/checkout@v3
       - name: Gather Artifacts
         run: |
+          cd ${{ github.workspace }}
+          pwd
           ls
           mkdir -p release
           cp -r build/app/outputs/flutter-apk/*.apk release/
