@@ -25,7 +25,6 @@ jobs:
           channel: "stable"
           architecture: x64
         
-      - run : cd build/app/outputs
       - run: flutter pub get
       - run: flutter build apk --release --split-per-abi
 
