@@ -177,21 +177,21 @@ jobs:
         with:
           name: windows-build
           path: build/windows/x64/runner/Release/
-        - name: Zip Android APKs
-          run: zip -r release/android-apk.zip build/app/outputs/flutter-apk/
-        - name: Copy iOS IPA
-          run: cp build/ios/iphoneos/app.ipa release/
-        - name: Zip Web Artifacts
-          run: zip -r release/web-build.zip build/web/
-        - name: Zip Linux Artifacts
-          run: zip -r release/linux-build.zip build/linux/x64/release/bundle/
-        - name: Zip macOS Artifacts
-          run: zip -r release/macos-build.zip build/macos/Build/Products/Release/
-        - name: Zip Windows Artifacts
-          run: zip -r release/windows-build.zip build/windows/x64/runner/Release/
-        - name: Push to Releases
-          uses: ncipollo/release-action@v1
-          with:
-            artifacts: release/*.zip
-            tag: v1.0.${{ github.run_number }}
-            token: ${{ secrets.TOKEN }}
+      - name: Zip Android APKs
+        run: zip -r release/android-apk.zip build/app/outputs/flutter-apk/
+      - name: Copy iOS IPA
+        run: cp build/ios/iphoneos/app.ipa release/
+      - name: Zip Web Artifacts
+        run: zip -r release/web-build.zip build/web/
+      - name: Zip Linux Artifacts
+        run: zip -r release/linux-build.zip build/linux/x64/release/bundle/
+      - name: Zip macOS Artifacts
+        run: zip -r release/macos-build.zip build/macos/Build/Products/Release/
+      - name: Zip Windows Artifacts
+        run: zip -r release/windows-build.zip build/windows/x64/runner/Release/
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/*.zip
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
