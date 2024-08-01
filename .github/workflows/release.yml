@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version number'
+        required: true
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Download artifacts
+        id: download-artifact
+        uses: dawidd6/action-download-artifact@v6
+        with:
+          github_token: ${{secrets.TOKEN}}
+          workflow: build.yml
+          workflow_search: false
+          workflow_conclusion: success
+          branch: main
+          path: release
+          skip_unpack: true
+          repo: ${{ github.repository }}
+          if_no_artifact_found: fail
+      - name: Push to Releases
+        uses: ncipollo/release-action@v1
+        with:
+          artifacts: release/*
+          tag: v1.0.${{ github.run_number }}
+          token: ${{ secrets.TOKEN }}
