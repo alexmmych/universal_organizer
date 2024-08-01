@@ -1,4 +1,4 @@
-package com.example.flutter_application
+package com.example.universal_organizer
 
 import io.flutter.embedding.android.FlutterActivity
 
