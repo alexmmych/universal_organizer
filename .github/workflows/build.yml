@@ -4,7 +4,6 @@ on:
   pull_request:
     branches:
       - main
-      - workflow
       - master
     paths:
       lib/main.dart
@@ -12,7 +11,6 @@ on:
     branches:
       - main
       - master
-      - workflow
     paths:
       lib/main.dart
 
@@ -24,7 +22,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
@@ -44,7 +42,7 @@ jobs:
       - uses: actions/setup-java@v3
         with:
           distribution: "zulu"
-          java-version: "17"
+          java-version: "21"
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
