@@ -2,7 +2,7 @@ name: Build
 on:
   workflow_run:
     workflows: ["Flutter Tests"]
-    branches: [main]
+    branches: [main, development]
     types: 
       - completed
 
