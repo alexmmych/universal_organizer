@@ -13,7 +13,7 @@ on:
       - main
       - master
       - workflow
-      - develop
+      - development
     paths:
       lib/main.dart
 
