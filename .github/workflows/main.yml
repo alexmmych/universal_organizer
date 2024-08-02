@@ -120,7 +120,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: macos-build
-          path: build/macos/Build/Products/Release/*.app
+          path: build/macos/Build/Products/Release
 
   build-windows:
     runs-on: windows-latest
@@ -136,7 +136,7 @@ jobs:
         uses: actions/upload-artifact@v3
         with:
           name: windows-build
-          path: build/windows/x64/runner/Release/*.exe
+          path: build/windows/x64/runner/Release
 
   release:
     runs-on: ubuntu-latest
