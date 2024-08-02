@@ -6,12 +6,16 @@ on:
       - main
       - workflow
       - master
+    paths:
+      lib/main.dart
   push:
     branches:
       - main
       - master
       - workflow
       - develop
+    paths:
+      lib/main.dart
 
 jobs:
   build-android:
