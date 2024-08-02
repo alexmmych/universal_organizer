@@ -1,18 +1,10 @@
 name: Build
-
 on:
-  pull_request:
-    branches:
-      - main
-      - master
-    paths:
-      lib/main.dart
-  push:
-    branches:
-      - main
-      - master
-    paths:
-      lib/main.dart
+  workflow_run:
+    workflows: ["Flutter Tests"]
+    branches: [main]
+    types: 
+      - completed
 
 jobs:
   build-android:
