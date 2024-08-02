@@ -27,5 +27,5 @@ jobs:
         uses: ncipollo/release-action@v1
         with:
           artifacts: release/*
-          tag: v1.0.${{ github.run_number }}
+          tag: v1.0.${{ inputs.version }}
           token: ${{ secrets.TOKEN }}
