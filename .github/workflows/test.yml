@@ -10,10 +10,8 @@ name: Flutter Tests
 on:
   pull_request:
     branches: [main, development]
-    paths: [lib/main.dart, test/basic_test.dart]
   push:
     branches: [main, development]
-    paths: [lib/main.dart, test/basic_test.dart]
     
 # on: push    # Default will running for every branch.
     
