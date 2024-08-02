@@ -18,7 +18,7 @@ on:
 # on: push    # Default will running for every branch.
     
 jobs:
-  build:
+  test:
     # This job will run on ubuntu virtual machine
     runs-on: ubuntu-latest
     steps:
