@@ -1,7 +1,7 @@
 name: Build
 on:
   workflow_run:
-    workflows: ["Test"]
+    workflows: ["test"]
     types: 
       - completed
 
