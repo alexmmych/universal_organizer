@@ -106,6 +106,9 @@ jobs:
 
       - name: Upload ${matrix.platform.name} Artifacts
         if: matrix.platform.name == 'macOS'
+        run: |
+          cd build/macos/Build/Products/Release
+          zip -r macos-app.zip .
         uses: actions/upload-artifact@v3
         with:
           name: macos-build
