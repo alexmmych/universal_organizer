@@ -69,52 +69,56 @@ jobs:
             flutter build ${matrix.platform.name.toLowerCase()}
           fi
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Upload Android Artifacts
         if: matrix.platform.name == 'Android'
         uses: actions/upload-artifact@v3
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/*.apk
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Zip iOS Artifacts
         if: matrix.platform.name == 'iOS'
         run: |
-          cd build/ios/iphoneos
-          mkdir Payload
-          cd Payload
-          ln -s ../Runner.app
-          cd ..
+          mkdir -p ios-artifacts/Payload
+          cp -R build/ios/iphoneos/Runner.app ios-artifacts/Payload/
+          cd ios-artifacts
           zip -r app.ipa Payload
+
+      - name: Upload iOS Artifacts
         uses: actions/upload-artifact@v3
+        if: matrix.platform.name == 'iOS'
         with:
           name: ios-ipa
-          path: build/ios/iphoneos/app.ipa
+          path: ios-artifacts/app.ipa
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Upload Web Artifacts
         if: matrix.platform.name == 'Web'
         uses: actions/upload-artifact@v3
         with:
           name: web-build
           path: build/web
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Upload Linux Artifacts
         if: matrix.platform.name == 'Linux'
         uses: actions/upload-artifact@v3
         with:
           name: linux-build
           path: build/linux/x64/release/bundle
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Zip macOS Artifacts
         if: matrix.platform.name == 'macOS'
         run: |
           cd build/macos/Build/Products/Release
           zip -r macos-app.zip .
+
+      - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v3
+        if: matrix.platform.name == 'macOS'
         with:
           name: macos-build
           path: build/macos/Build/Products/Release/macos-app.zip
 
-      - name: Upload ${matrix.platform.name} Artifacts
+      - name: Upload Windows Artifacts
         if: matrix.platform.name == 'Windows'
         uses: actions/upload-artifact@v3
         with:
