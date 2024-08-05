@@ -2,9 +2,6 @@
 # Gist link: https://gist.github.com/aagarwal1012/eb2551683d81cf47d60868ab607520b1
 
 # The following gist has been slightly modified to test on linux instead of apk
-
-# This workflow is triggered on pushes and pulls to the repository.
-
 name: Test
 on:
   pull_request:
