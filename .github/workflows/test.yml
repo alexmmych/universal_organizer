@@ -10,9 +10,6 @@ on:
   pull_request:
     branches: [main]
     paths: [lib/**, test/**, .github/workflows/**]
-  push:
-    branches: [main]
-    paths: [lib/**, test/**, .github/workflows/**]
     
 # on: push    # Default will running for every branch.
     
@@ -21,7 +18,7 @@ jobs:
     # This job will run on ubuntu virtual machine
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v3
+      - uses: actions/checkout@v4
       - uses: subosito/flutter-action@v2
         with:
           channel: "stable"
