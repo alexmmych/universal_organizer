@@ -10,9 +10,6 @@ on:
   pull_request:
     branches: [main]
     paths: [lib/**, test/**, .github/workflows/**]
-  push:
-    branches: [main]
-    paths: [lib/**, test/**, .github/workflows/**]
     
 # on: push    # Default will running for every branch.
     
