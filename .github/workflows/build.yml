@@ -1,21 +1,9 @@
 name: Build
-
 on:
-  pull_request:
-    branches:
-      - main
-      - workflow
-      - master
-    paths:
-      lib/main.dart
-  push:
-    branches:
-      - main
-      - master
-      - workflow
-      - develop
-    paths:
-      lib/main.dart
+  workflow_run:
+    workflows: ["test"]
+    types: 
+      - completed
 
 jobs:
   build-android:
