@@ -9,7 +9,6 @@ on:
 jobs:
   build:
     if: github.event_name == 'workflow_run' || github.event_name == 'pull_request'
-    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
         platform:
