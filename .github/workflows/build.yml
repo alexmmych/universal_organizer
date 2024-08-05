@@ -131,3 +131,12 @@ jobs:
         with:
           name: windows-build
           path: build/windows/x64/runner/Release
+  cleanup:
+    needs: [build-android, build-ios, build-web, build-linux, build-macos, build-windows]
+    runs-on: ubuntu-latest
+    if: ${{ failure() }}
+    steps:
+      - name: Delete build artifacts
+        uses: geekyeggo/delete-artifact@v5
+        with:
+          name: "**-build"
