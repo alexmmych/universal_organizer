@@ -1,39 +1,31 @@
 name: Test & Build
-
 on:
   pull_request:
-    branches: [main]
-    paths: [lib/**, test/**, .github/workflows/**]
-    
-# on: push    # Default will running for every branch.
-    
+  workflow_run:
+    workflows: ["test"]
+    types:
+      - completed
+
 jobs:
   build:
     if: github.event_name == 'workflow_run' || github.event_name == 'pull_request'
-    runs-on: ubuntu-latest
+    runs-on: ${{ matrix.os }}
     strategy:
       matrix:
-        platform: [android, ios, web, linux, macos, windows]
-        include:
-          - platform: android
-            os: ubuntu-latest
-          - platform: ios
-            os: macos-latest
-          - platform: web
-            os: ubuntu-latest
-          - platform: linux
-            os: ubuntu-latest
-          - platform: macos
-            os: macos-latest
-          - platform: windows
-            os: windows-latest
+        platform:
+          - { name: Android, os: ubuntu-latest }
+          - { name: iOS, os: macos-latest }
+          - { name: Web, os: ubuntu-latest }
+          - { name: Linux, os: ubuntu-latest }
+          - { name: macOS, os: macos-latest }
+          - { name: Windows, os: windows-latest }
 
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
 
       - name: Setup Java for Android and iOS
-        if: matrix.platform == 'android' || matrix.platform == 'ios'
+        if: matrix.platform.name == 'Android' || matrix.platform.name == 'iOS'
         uses: actions/setup-java@v3
         with:
           distribution: "zulu"
@@ -45,8 +37,8 @@ jobs:
           channel: "stable"
           architecture: x64
 
-      - name: Install dependencies
-        if: matrix.platform == 'linux'
+      - name: Install dependencies for Linux
+        if: matrix.platform.name == 'Linux'
         run: |
           sudo apt-get update
           sudo apt-get install -y \
@@ -62,75 +54,65 @@ jobs:
             libprotobuf-dev \
             protobuf-compiler
 
-      - name: Get Flutter packages
+      - name: Flutter pub get
         run: flutter pub get
 
-      - name: Test
+      - name: Build ${matrix.platform.name}
         run: |
-          flutter analyze .
-          flutter test
+          if [ "${matrix.platform.name}" == "macOS" ]; then
+            flutter build macos --release
+            cd build/macos/Build/Products/Release
+            zip -r macos-app.zip .
+          elif [ "${matrix.platform.name}" == "Windows" ]; then
+            flutter build windows --release
+          else
+            flutter build ${matrix.platform.name.toLowerCase()}
+          fi
 
-      - name: Build APK for Android
-        if: matrix.platform == 'android'
-        run: flutter build apk --release --split-per-abi
-
-      - name: Build IPA for iOS
-        if: matrix.platform == 'ios'
-        run: flutter build ios --no-codesign
-
-      - name: Build Web
-        if: matrix.platform == 'web'
-        run: flutter build web
-
-      - name: Build Linux
-        if: matrix.platform == 'linux'
-        run: flutter build linux
-
-      - name: Build macOS
-        if: matrix.platform == 'macos'
-        run: flutter build macos
-
-      - name: Build Windows
-        if: matrix.platform == 'windows'
-        run: flutter build windows
-
-      - name: Upload Android APK
-        if: matrix.platform == 'android'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'Android'
         uses: actions/upload-artifact@v3
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/*.apk
 
-      - name: Upload iOS IPA
-        if: matrix.platform == 'ios'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'iOS'
+        run: |
+          cd build/ios/iphoneos
+          mkdir Payload
+          cd Payload
+          ln -s ../Runner.app
+          cd ..
+          zip -r app.ipa Payload
         uses: actions/upload-artifact@v3
         with:
           name: ios-ipa
           path: build/ios/iphoneos/app.ipa
 
-      - name: Upload Web build
-        if: matrix.platform == 'web'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'Web'
         uses: actions/upload-artifact@v3
         with:
           name: web-build
           path: build/web
 
-      - name: Upload Linux build
-        if: matrix.platform == 'linux'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'Linux'
         uses: actions/upload-artifact@v3
         with:
           name: linux-build
           path: build/linux/x64/release/bundle
 
-      - name: Upload macOS build
-        if: matrix.platform == 'macos'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'macOS'
         uses: actions/upload-artifact@v3
         with:
           name: macos-build
-          path: build/macos/Build/Products/Release
+          path: build/macos/Build/Products/Release/macos-app.zip
 
-      - name: Upload Windows build
-        if: matrix.platform == 'windows'
+      - name: Upload ${matrix.platform.name} Artifacts
+        if: matrix.platform.name == 'Windows'
         uses: actions/upload-artifact@v3
         with:
           name: windows-build
