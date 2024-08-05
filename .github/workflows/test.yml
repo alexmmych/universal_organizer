@@ -8,9 +8,11 @@
 name: Test
 on:
   pull_request:
-    branches: [main, development]
+    branches: [main]
+    paths: [lib/**, test/**, .github/workflows/**]
   push:
-    branches: [main, development]
+    branches: [main]
+    paths: [lib/**, test/**, .github/workflows/**]
     
 # on: push    # Default will running for every branch.
     
