@@ -8,9 +8,9 @@
 name: Test
 on:
   pull_request:
-    branches: [main, development]
+    branches: [main]
   push:
-    branches: [main, development]
+    branches: [main]
     
 # on: push    # Default will running for every branch.
     
