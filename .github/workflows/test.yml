@@ -1,8 +1,6 @@
 name: Test
 on:
-  pull_request:
-    branches: [main]
-    paths: [lib/**, test/**, .github/workflows/**]
+  workflow_call:
     
 jobs:
   test:

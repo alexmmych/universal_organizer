@@ -8,16 +8,7 @@ jobs:
   wait-tests:
     runs-on: ubuntu-latest
     steps:
-      - run: sudo chmod +x /home/runner/work/_actions/kamilchodola/wait-for-workflow-action/1.1.0/scripts/wait-for-workflow.sh
-      - uses: kamilchodola/wait-for-workflow-action@1.1.0
-        with:
-          GITHUB_TOKEN: ${{ secrets.TOKEN }}
-          workflow_id: 'test.yml'
-          max_wait_minutes: '5'
-          interval: '5'
-          timeout: '60'
-          org_name: "alexmmych"
-          repo_name: "universal_organizer"
+      - uses: alexmmych/universal_organizer/.github/workflows/test.yml@main
   build-android:
     needs: wait-tests
     runs-on: ubuntu-latest
