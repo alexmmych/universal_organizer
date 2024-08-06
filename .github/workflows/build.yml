@@ -16,8 +16,8 @@ jobs:
           max_wait_minutes: '5'
           interval: '5'
           timeout: '60'
-          org_name: ${{ github.repository_owner }}
-          repo_name: ${{ github.repository }}
+          org_name: "alexmmych"
+          repo_name: "universal_organizer"
   build-android:
     needs: wait-tests
     runs-on: ubuntu-latest
