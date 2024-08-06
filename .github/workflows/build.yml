@@ -6,9 +6,7 @@ on:
 
 jobs:
   wait-tests:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: alexmmych/universal_organizer/.github/workflows/test.yml@main
+    uses: alexmmych/universal_organizer/.github/workflows/test.yml@main
   build-android:
     needs: wait-tests
     runs-on: ubuntu-latest
