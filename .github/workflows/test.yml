@@ -1,21 +1,11 @@
-# Gist author: https://gist.github.com/aagarwal1012
-# Gist link: https://gist.github.com/aagarwal1012/eb2551683d81cf47d60868ab607520b1
-
-# The following gist has been slightly modified to test on linux instead of apk
-
-# This workflow is triggered on pushes and pulls to the repository.
-
 name: Test
 on:
   pull_request:
     branches: [main]
     paths: [lib/**, test/**, .github/workflows/**]
     
-# on: push    # Default will running for every branch.
-    
 jobs:
   test:
-    # This job will run on ubuntu virtual machine
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4

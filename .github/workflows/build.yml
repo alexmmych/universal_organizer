@@ -9,7 +9,7 @@ jobs:
     uses: kamilchodola/wait-for-workflow-action@1.1.0
     with:
       GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      workflow_id: 'workflow_name.yml'
+      workflow_id: 'test.yml'
       max_wait_minutes: '5'
       interval: '5'
       timeout: '60'
