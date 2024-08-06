@@ -9,13 +9,12 @@ jobs:
     uses: kamilchodola/wait-for-workflow-action@1.1.0
     with:
       GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      workflow_id: 'workflow_name.yml'
+      workflow_id: 'test.yml'
       max_wait_minutes: '5'
       interval: '5'
       timeout: '60'
       org_name: ${{ github.repository_owner }}
       repo_name: ${{ github.repository }}
-      ref: '${{ github.ref }}'
   build-android:
     runs-on: ubuntu-latest
     steps:
