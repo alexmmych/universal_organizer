@@ -7,7 +7,7 @@ void main() {
     await tester.pumpWidget(const MainApp());
 
     // Create the Finders.
-    final messageFinder = find.text('Hello World!');
+    final messageFinder = find.text('Hello World! TEST');
 
     // Use the `findsOneWidget` matcher provided by flutter_test to verify
     // that the Text widgets appear exactly once in the widget tree.

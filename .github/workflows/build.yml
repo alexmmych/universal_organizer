@@ -6,16 +6,9 @@ on:
 
 jobs:
   wait-tests:
-    uses: kamilchodola/wait-for-workflow-action@1.1.0
-    with:
-      GITHUB_TOKEN: ${{ secrets.TOKEN }}
-      workflow_id: 'test.yml'
-      max_wait_minutes: '5'
-      interval: '5'
-      timeout: '60'
-      org_name: ${{ github.repository_owner }}
-      repo_name: ${{ github.repository }}
+    uses: alexmmych/universal_organizer/.github/workflows/test.yml@main
   build-android:
+    needs: wait-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -36,6 +29,7 @@ jobs:
           path: build/app/outputs/flutter-apk/*.apk
 
   build-ios:
+    needs: wait-tests
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -63,6 +57,7 @@ jobs:
           path: build/ios/iphoneos/app.ipa
 
   build-web:
+    needs: wait-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -79,6 +74,7 @@ jobs:
           path: build/web
 
   build-linux:
+    needs: wait-tests
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -110,6 +106,7 @@ jobs:
           path: build/linux/x64/release/bundle
 
   build-macos:
+    needs: wait-tests
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -126,6 +123,7 @@ jobs:
           path: build/macos/Build/Products/Release
 
   build-windows:
+    needs: wait-tests
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -149,9 +147,3 @@ jobs:
       uses: re-actors/alls-green@release/v1
       with:
         jobs: ${{ toJSON(needs) }}
-
-
-      # - name: Delete build artifacts
-      #   uses: geekyeggo/delete-artifact@v5
-      #   with:
-      #     name: "**-build"
