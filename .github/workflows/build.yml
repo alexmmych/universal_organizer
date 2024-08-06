@@ -15,7 +15,6 @@ jobs:
       timeout: '60'
       org_name: ${{ github.repository_owner }}
       repo_name: ${{ github.repository }}
-      ref: '${{ github.ref }}'
   build-android:
     runs-on: ubuntu-latest
     steps:
