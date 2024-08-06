@@ -1,11 +1,21 @@
 name: Build
 on:
-  workflow_run:
-    workflows: ["test"]
-    types: 
-      - completed
+  pull_request:
+    branches: [main]
+    paths: [lib/**, test/**, .github/workflows/**]
 
 jobs:
+  wait-tests:
+    uses: kamilchodola/wait-for-workflow-action@1.1.0
+    with:
+      GITHUB_TOKEN: ${{ secrets.TOKEN }}
+      workflow_id: 'workflow_name.yml'
+      max_wait_minutes: '5'
+      interval: '5'
+      timeout: '60'
+      org_name: ${{ github.repository_owner }}
+      repo_name: ${{ github.repository }}
+      ref: '${{ github.ref }}'
   build-android:
     runs-on: ubuntu-latest
     steps:
