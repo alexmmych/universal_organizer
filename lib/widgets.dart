@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 
 import 'package:universal_organizer/globals.dart';
 
+// ChatGPT used here to make ValueNotifier and their builders
 class TopBar extends StatefulWidget {
   final ValueNotifier<Brightness> brightness;
 
@@ -26,9 +27,9 @@ class _TopBarState extends State<TopBar> {
       foregroundTheme = backgroundTheme;
       backgroundTheme = tempColor;
 
-      widget.brightness.value = widget.brightness.value == Brightness.dark
+      widget.brightness.value = (widget.brightness.value == Brightness.dark
           ? Brightness.light
-          : Brightness.dark;
+          : Brightness.dark);
     });
   }
 
@@ -38,7 +39,8 @@ class _TopBarState extends State<TopBar> {
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: backgroundTheme.secondary,
-          title: const Text("Test"),
+          title: const Text("Universal Organizer",
+              style: TextStyle(fontWeight: FontWeight.bold)),
           actions: <Widget>[
             Container(
               height: 40.0,
@@ -84,6 +86,7 @@ class BaseClass extends StatelessWidget {
       builder: (context, brightnessValue, child) {
         return MaterialApp(
           theme: ThemeData(
+            useMaterial3: useMaterial3,
             brightness: brightnessValue,
             colorScheme: ColorScheme.fromSeed(
               seedColor: colorSelected,
