@@ -56,8 +56,8 @@ class _TopBarState extends State<TopBar> {
                   builder: (context, brightness, child) {
                     return Icon(
                       brightness == Brightness.dark
-                          ? CupertinoIcons.moon
-                          : CupertinoIcons.sun_max,
+                          ? CupertinoIcons.sun_max
+                          : CupertinoIcons.moon,
                       color: backgroundTheme.primary,
                     );
                   },
