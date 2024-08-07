@@ -15,9 +15,9 @@ jobs:
         uses: dawidd6/action-download-artifact@v6
         with:
           github_token: ${{secrets.TOKEN}}
-          workflow_search: true
-          workflow_conclusion: completed
-          branch: main
+          workflow: build.yml
+          workflow_search: false
+          workflow_conclusion: success
           path: release
           skip_unpack: true
           repo: ${{ github.repository }}
