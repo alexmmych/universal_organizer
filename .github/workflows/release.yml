@@ -16,11 +16,9 @@ jobs:
         with:
           github_token: ${{secrets.TOKEN}}
           workflow_search: true
-          workflow_conclusion: success
+          workflow_conclusion: completed
           branch: main
           path: release
-          name: (?:.*-build)|(?:.*-apk)|(?:.*-ipa)
-          name_is_regexp: true
           skip_unpack: true
           repo: ${{ github.repository }}
           if_no_artifact_found: fail
