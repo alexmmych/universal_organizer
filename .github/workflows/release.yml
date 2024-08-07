@@ -18,7 +18,6 @@ jobs:
           workflow: build.yml
           workflow_search: false
           workflow_conclusion: success
-          branch: main
           path: release
           skip_unpack: true
           repo: ${{ github.repository }}
