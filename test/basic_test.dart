@@ -4,10 +4,36 @@ import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:universal_organizer/widgets.dart';
 
-void main() {
+import 'package:hive_flutter/hive_flutter.dart';
+import 'package:mockito/mockito.dart';
+
+class MockBox extends Mock implements Box {}
+
+void main() async {
+  setUp(() async {
+    await Hive.initFlutter();
+  });
+
+  test("Example test with Hive and Mockito", () async {
+    final mockBox = MockBox();
+
+    when(mockBox.get('key')).thenReturn('mocked value');
+    when(mockBox.put('key', any)).thenAnswer((_) async {});
+
+    // Perform operations
+    final value = mockBox.get('key');
+
+    // Assertions
+    expect(value, 'mocked value');
+  });
+
   testWidgets("App and TopBar exist", (tester) async {
     // Create the widget by telling the tester to build it.
+
     await tester.pumpWidget(const App());
+
+    // Wait for indicator to stop spinning
+    await tester.pumpAndSettle(); // Wait for refresh indicator to stop spinning
 
     // Create the Finders.
     final messageFinder = find.text('Universal Organizer');
@@ -20,8 +46,13 @@ void main() {
   });
 
   testWidgets("App and TopBar elements work as expected", (tester) async {
-    // Initialize the ValueNotifier with light mode
-    final brightnessNotifier = ValueNotifier<Brightness>(Brightness.light);
+    await Hive.openBox('settings');
+
+    var box = await Hive.box('settings');
+
+    bool isDarkMode = box.get('night_mode', defaultValue: false) ?? false;
+    final brightnessNotifier = ValueNotifier<Brightness>(
+        isDarkMode ? Brightness.dark : Brightness.light);
 
     // Build the widget with the brightnessNotifier as a value we can monitor
     await tester.pumpWidget(BaseClass(brightness: brightnessNotifier));
