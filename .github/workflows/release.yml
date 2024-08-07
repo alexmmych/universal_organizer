@@ -19,6 +19,8 @@ jobs:
           workflow_conclusion: success
           branch: main
           path: release
+          name: (?:.*-build)|(?:.*-apk)|(?:.*-ipa)
+          name_is_regexp: true
           skip_unpack: true
           repo: ${{ github.repository }}
           if_no_artifact_found: fail
