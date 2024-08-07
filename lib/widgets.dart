@@ -17,19 +17,17 @@ class TopBar extends StatefulWidget {
 }
 
 class _TopBarState extends State<TopBar> {
-  var foregroundTheme = dayTheme;
-  var backgroundTheme = nightTheme;
+  var theme = BackgroundForeground.dayTheme;
 
   void changeTheme() {
     setState(() {
-      var tempColor = foregroundTheme;
+      theme = (theme == BackgroundForeground.dayTheme
+          ? BackgroundForeground.nightTheme
+          : BackgroundForeground.dayTheme);
 
-      foregroundTheme = backgroundTheme;
-      backgroundTheme = tempColor;
-
-      widget.brightness.value = (widget.brightness.value == Brightness.dark
-          ? Brightness.light
-          : Brightness.dark);
+      widget.brightness.value = (widget.brightness.value == Brightness.light
+          ? Brightness.dark
+          : Brightness.light);
     });
   }
 
@@ -38,33 +36,56 @@ class _TopBarState extends State<TopBar> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: backgroundTheme.secondary,
+          backgroundColor: theme.background.secondary,
           title: const Text("Universal Organizer",
               style: TextStyle(fontWeight: FontWeight.bold)),
           actions: <Widget>[
-            Container(
-              height: 40.0,
-              margin: const EdgeInsetsDirectional.symmetric(horizontal: 15.0),
-              child: FloatingActionButton(
-                onPressed: changeTheme,
-                shape: const CircleBorder(),
-                backgroundColor: foregroundTheme.secondary,
-                hoverColor: colorSelected,
-                splashColor: foregroundTheme.secondary,
-                child: ValueListenableBuilder<Brightness>(
-                  valueListenable: widget.brightness,
-                  builder: (context, brightness, child) {
-                    return Icon(
-                      brightness == Brightness.dark
-                          ? CupertinoIcons.sun_max
-                          : CupertinoIcons.moon,
-                      color: backgroundTheme.primary,
-                    );
-                  },
-                ),
-              ),
+            Row(
+              children: [
+                Button(theme: theme, widget: widget, onPressed: changeTheme),
+                // Small space between the buttons and the edge of the screen
+                const SizedBox(width: 10.0),
+              ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class Button extends StatelessWidget {
+  const Button({
+    super.key,
+    required this.theme,
+    required this.widget,
+    required this.onPressed,
+  });
+
+  final VoidCallback onPressed;
+  final BackgroundForeground theme;
+  final TopBar widget;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40.0,
+      child: FloatingActionButton(
+        onPressed: onPressed,
+        shape: const CircleBorder(),
+        backgroundColor: theme.foreground.secondary,
+        hoverColor: colorSelected,
+        splashColor: theme.foreground.secondary,
+        child: ValueListenableBuilder<Brightness>(
+          valueListenable: widget.brightness,
+          builder: (context, brightness, child) {
+            return Icon(
+              brightness == Brightness.dark
+                  ? CupertinoIcons.sun_max
+                  : CupertinoIcons.moon,
+              color: theme.background.primary,
+            );
+          },
         ),
       ),
     );
