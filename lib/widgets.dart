@@ -57,7 +57,7 @@ class _TopBarState extends State<TopBar> {
                         : CupertinoIcons.moon),
                 Button(
                     theme: theme,
-                    onPressed: () => print("Hello World"),
+                    onPressed: () {},
                     icon: CupertinoIcons.settings),
                 // Small space between the buttons and the edge of the screen
                 const SizedBox(width: 10.0),
