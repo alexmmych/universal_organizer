@@ -5,8 +5,8 @@ on:
     paths: [lib/**, test/**, .github/workflows/**]
 
 jobs:
-  wait-tests:
-    uses: alexmmych/universal_organizer/.github/workflows/test.yml@main
+  wait-analyze:
+    uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@main
   build-android:
     needs: wait-tests
     runs-on: ubuntu-latest
