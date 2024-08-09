@@ -11,14 +11,7 @@ void main() async {
 
 class App extends StatefulWidget {
   const App({super.key});
-class App extends StatefulWidget {
-  const App({super.key});
 
-  @override
-  State<App> createState() => _AppState();
-}
-
-class _AppState extends State<App> {
   @override
   State<App> createState() => _AppState();
 }
