@@ -8,7 +8,7 @@ jobs:
   wait-analyze:
     uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@development
   build-android:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
           path: build/app/outputs/flutter-apk/*.apk
 
   build-ios:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
           path: build/ios/iphoneos/app.ipa
 
   build-web:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
           path: build/web
 
   build-linux:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
           path: build/linux/x64/release/bundle
 
   build-macos:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +123,7 @@ jobs:
           path: build/macos/Build/Products/Release
 
   build-windows:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
