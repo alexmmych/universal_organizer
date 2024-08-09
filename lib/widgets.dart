@@ -1,9 +1,9 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:universal_organizer/color_theme.dart';
 
-import 'package:universal_organizer/globals.dart';
+import 'package:hive/hive.dart';
 
-// ChatGPT used here to make ValueNotifier and their builders
 class TopBar extends StatefulWidget {
   final ValueNotifier<Brightness> brightness;
 
@@ -17,19 +17,24 @@ class TopBar extends StatefulWidget {
 }
 
 class _TopBarState extends State<TopBar> {
-  var foregroundTheme = dayTheme;
-  var backgroundTheme = nightTheme;
+  var theme = getNightMode();
 
   void changeTheme() {
     setState(() {
-      var tempColor = foregroundTheme;
+      // Sets the theme for the app
+      theme = (theme == BackgroundForeground.dayTheme
+          ? BackgroundForeground.nightTheme
+          : BackgroundForeground.dayTheme);
 
-      foregroundTheme = backgroundTheme;
-      backgroundTheme = tempColor;
+      // Changes the brightness type
+      widget.brightness.value = (widget.brightness.value == Brightness.light
+          ? Brightness.dark
+          : Brightness.light);
 
-      widget.brightness.value = (widget.brightness.value == Brightness.dark
-          ? Brightness.light
-          : Brightness.dark);
+      // Saves changes in hive settings box
+      widget.brightness.value == Brightness.dark
+          ? setNightMode(true)
+          : setNightMode(false);
     });
   }
 
@@ -38,33 +43,58 @@ class _TopBarState extends State<TopBar> {
     return SafeArea(
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: backgroundTheme.secondary,
+          backgroundColor: theme.background.secondary,
           title: const Text("Universal Organizer",
               style: TextStyle(fontWeight: FontWeight.bold)),
           actions: <Widget>[
-            Container(
-              height: 40.0,
-              margin: const EdgeInsetsDirectional.symmetric(horizontal: 15.0),
-              child: FloatingActionButton(
-                onPressed: changeTheme,
-                shape: const CircleBorder(),
-                backgroundColor: foregroundTheme.secondary,
-                hoverColor: colorSelected,
-                splashColor: foregroundTheme.secondary,
-                child: ValueListenableBuilder<Brightness>(
-                  valueListenable: widget.brightness,
-                  builder: (context, brightness, child) {
-                    return Icon(
-                      brightness == Brightness.dark
-                          ? CupertinoIcons.moon
-                          : CupertinoIcons.sun_max,
-                      color: backgroundTheme.primary,
-                    );
-                  },
-                ),
-              ),
+            Row(
+              children: [
+                Button(
+                    theme: theme,
+                    onPressed: changeTheme,
+                    icon: widget.brightness.value == Brightness.dark
+                        ? CupertinoIcons.sun_max
+                        : CupertinoIcons.moon),
+                Button(
+                    theme: theme,
+                    onPressed: () {},
+                    icon: CupertinoIcons.settings),
+                // Small space between the buttons and the edge of the screen
+                const SizedBox(width: 10.0),
+              ],
             ),
           ],
+        ),
+      ),
+    );
+  }
+}
+
+class Button extends StatelessWidget {
+  const Button({
+    super.key,
+    required this.theme,
+    required this.icon,
+    required this.onPressed,
+  });
+
+  final VoidCallback onPressed;
+  final BackgroundForeground theme;
+  final IconData icon;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 40.0,
+      child: FloatingActionButton(
+        onPressed: onPressed,
+        shape: const CircleBorder(),
+        backgroundColor: theme.foreground.secondary,
+        hoverColor: colorSelected,
+        splashColor: theme.foreground.secondary,
+        child: Icon(
+          icon,
+          color: theme.background.primary,
         ),
       ),
     );
@@ -98,4 +128,18 @@ class BaseClass extends StatelessWidget {
       },
     );
   }
+}
+
+BackgroundForeground getNightMode() {
+  var box = Hive.box('settings');
+
+  return (box.get('night_mode', defaultValue: false)
+      ? BackgroundForeground.nightTheme
+      : BackgroundForeground.dayTheme);
+}
+
+// Function to toggle night mode
+Future<void> setNightMode(bool isNightMode) async {
+  var box = Hive.box('settings');
+  await box.put('night_mode', isNightMode);
 }

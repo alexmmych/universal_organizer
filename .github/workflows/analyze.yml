@@ -1,9 +1,9 @@
-name: Test
+name: Analyze
 on:
   workflow_call:
     
 jobs:
-  test:
+  analyze:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -28,4 +28,3 @@ jobs:
             protobuf-compiler
       - run: flutter pub get
       - run: flutter analyze .
-      - run: flutter test
