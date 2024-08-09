@@ -1,4 +1,4 @@
-name: Test
+name: Analyze
 on:
   workflow_call:
     
@@ -28,4 +28,3 @@ jobs:
             protobuf-compiler
       - run: flutter pub get
       - run: flutter analyze .
-      - run: flutter test
