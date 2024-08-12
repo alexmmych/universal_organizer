@@ -6,7 +6,7 @@ on:
 
 jobs:
   wait-analyze:
-    uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@development
+    uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@main
   build-android:
     needs: wait-analyze
     runs-on: ubuntu-latest
