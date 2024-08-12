@@ -1,15 +1,18 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
-import 'package:universal_organizer/color_theme.dart';
+import 'color_theme.dart';
 import 'package:hive/hive.dart';
 
-class TopBar extends StatefulWidget {
+class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final ValueNotifier<Brightness> brightness;
 
   const TopBar({
     super.key,
     required this.brightness,
-  });
+  }) : preferredSize = const Size.fromHeight(kToolbarHeight);
+
+  @override
+  final Size preferredSize; // default is 56.0
 
   @override
   State<TopBar> createState() => _TopBarState();
@@ -37,33 +40,43 @@ class _TopBarState extends State<TopBar> {
     });
   }
 
+  void showNavRail() {
+    setState(() {});
+  }
+
   @override
   Widget build(BuildContext context) {
     return SafeArea(
-      child: Scaffold(
-        appBar: AppBar(
-          backgroundColor: theme.background.secondary,
-          title: const Text("Universal Organizer",
-              style: TextStyle(fontWeight: FontWeight.bold)),
-          actions: <Widget>[
-            Row(
-              children: [
-                Button(
-                    theme: theme,
-                    onPressed: changeTheme,
-                    icon: widget.brightness.value == Brightness.dark
-                        ? CupertinoIcons.sun_max
-                        : CupertinoIcons.moon),
-                Button(
-                    theme: theme,
-                    onPressed: () => (),
-                    icon: CupertinoIcons.settings),
-                // Small space between the buttons and the edge of the screen
-                const SizedBox(width: 10.0),
-              ],
-            ),
+      child: AppBar(
+        backgroundColor: theme.background.secondary,
+        leading: Row(
+          children: [
+            Button(
+                theme: theme,
+                onPressed: showNavRail,
+                icon: CupertinoIcons.bars),
           ],
         ),
+        title: const Text("Universal Organizer",
+            style: TextStyle(fontWeight: FontWeight.bold)),
+        actions: <Widget>[
+          Row(
+            children: [
+              Button(
+                  theme: theme,
+                  onPressed: changeTheme,
+                  icon: widget.brightness.value == Brightness.dark
+                      ? CupertinoIcons.sun_max
+                      : CupertinoIcons.moon),
+              Button(
+                  theme: theme,
+                  onPressed: () => (),
+                  icon: CupertinoIcons.settings),
+              // Small space between the buttons and the edge of the screen
+              const SizedBox(width: 10.0),
+            ],
+          ),
+        ],
       ),
     );
   }

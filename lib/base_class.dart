@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:universal_organizer/color_theme.dart';
+import 'color_theme.dart';
 
 import 'top_bar.dart';
 
@@ -25,7 +25,7 @@ class BaseClass extends StatelessWidget {
               brightness: brightnessValue,
             ),
           ),
-          home: TopBar(brightness: brightness),
+          home: Scaffold(appBar: TopBar(brightness: brightness)),
         );
       },
     );

@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:universal_organizer/base_class.dart';
+import 'base_class.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 
