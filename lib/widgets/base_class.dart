@@ -3,7 +3,7 @@ import 'package:flutter/material.dart';
 import 'top_bar.dart';
 import 'nav_rail.dart';
 
-import 'nav_provider.dart';
+import '../providers/nav_provider.dart';
 import 'package:provider/provider.dart';
 
 class BaseClass extends StatelessWidget {
