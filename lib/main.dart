@@ -1,12 +1,20 @@
 import 'package:flutter/material.dart';
 import 'base_class.dart';
+import 'theme_provider.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
+import 'package:provider/provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
+
   await Hive.initFlutter(); // Initialize Hive with Flutter
-  runApp(const App());
+  await Hive.openBox('settings');
+
+  runApp(ChangeNotifierProvider(
+    create: (_) => ThemeProvider(),
+    child: const App(),
+  ));
 }
 
 class App extends StatefulWidget {
@@ -19,22 +27,8 @@ class App extends StatefulWidget {
 class _AppState extends State<App> {
   @override
   Widget build(BuildContext context) {
-    return FutureBuilder(
-        future: Hive.openBox('settings'),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.done) {
-            return BaseClass(
-              brightness: ValueNotifier(_getThemeBrightness()),
-            );
-          }
-          return const CircularProgressIndicator();
-        });
+    return Consumer<ThemeProvider>(builder: (context, themeProvider, child) {
+      return BaseClass(theme: themeProvider.themeData);
+    });
   }
-}
-
-Brightness _getThemeBrightness() {
-  var box = Hive.box('settings');
-  // Retrieve the value with a default of false if it's null
-  bool isDarkMode = box.get('night_mode', defaultValue: false) ?? false;
-  return isDarkMode ? Brightness.dark : Brightness.light;
 }
