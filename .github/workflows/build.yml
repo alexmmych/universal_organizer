@@ -5,10 +5,10 @@ on:
     paths: [lib/**, test/**, .github/workflows/**]
 
 jobs:
-  wait-tests:
+  wait-analyze:
     uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@main
   build-android:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -29,7 +29,7 @@ jobs:
           path: build/app/outputs/flutter-apk/*.apk
 
   build-ios:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -57,7 +57,7 @@ jobs:
           path: build/ios/iphoneos/app.ipa
 
   build-web:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -74,7 +74,7 @@ jobs:
           path: build/web
 
   build-linux:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -106,7 +106,7 @@ jobs:
           path: build/linux/x64/release/bundle
 
   build-macos:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -123,7 +123,7 @@ jobs:
           path: build/macos/Build/Products/Release
 
   build-windows:
-    needs: wait-tests
+    needs: wait-analyze
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -138,12 +138,3 @@ jobs:
         with:
           name: windows-build
           path: build/windows/x64/runner/Release
-  check:
-    if: ${{ always() }}
-    needs: [build-android, build-ios, build-web, build-linux, build-macos, build-windows]
-    runs-on: ubuntu-latest
-    steps:
-    - name: Decide whether the needed jobs succeeded or failed
-      uses: re-actors/alls-green@release/v1
-      with:
-        jobs: ${{ toJSON(needs) }}
