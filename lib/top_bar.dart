@@ -32,7 +32,7 @@ class _TopBarState extends State<TopBar> {
 
     return SafeArea(
       child: AppBar(
-        backgroundColor: themeProvider.themeData.scaffoldBackgroundColor,
+        backgroundColor: themeProvider.themeData.dividerColor,
         leading: Row(
           children: [
             Button(onPressed: changeNavRail, icon: CupertinoIcons.bars),
@@ -47,7 +47,9 @@ class _TopBarState extends State<TopBar> {
                   onPressed: () {
                     themeProvider.toggleTheme();
                   },
-                  icon: CupertinoIcons.moon),
+                  icon: themeProvider.getCurrentTheme(context)
+                      ? CupertinoIcons.sun_max
+                      : CupertinoIcons.moon),
               Button(onPressed: () => (), icon: CupertinoIcons.settings),
               // Small space between the buttons and the edge of the screen
               const SizedBox(width: 10.0),
@@ -82,7 +84,7 @@ class Button extends StatelessWidget {
         splashColor: themeProvider.themeData.splashColor,
         child: Icon(
           icon,
-          color: themeProvider.themeData.disabledColor,
+          color: themeProvider.getOppositeColor(context),
         ),
       ),
     );

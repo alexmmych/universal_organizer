@@ -32,16 +32,26 @@ class ThemeProvider extends ChangeNotifier {
     notifyListeners(); // Notify listeners to rebuild UI
   }
 
+  Color getOppositeColor(BuildContext context) {
+    final brightness = Theme.of(context).brightness;
+
+    return brightness == Brightness.light ? Colors.black : Colors.white;
+  }
+
+  bool getCurrentTheme(BuildContext context) {
+    return settingsBox.get('isDarkMode', defaultValue: false);
+  }
+
   // Create the ThemeData based on the current state
   ThemeData _createThemeData() {
     return ThemeData(
-      useMaterial3: true,
-      brightness: _isDarkMode ? Brightness.dark : Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: _seedColor,
+        useMaterial3: true,
         brightness: _isDarkMode ? Brightness.dark : Brightness.light,
-      ),
-      highlightColor: _isDarkMode ? Colors.orangeAccent : Colors.blueAccent,
-    );
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _seedColor,
+          brightness: _isDarkMode ? Brightness.dark : Brightness.light,
+        ),
+        highlightColor: Colors.blueAccent,
+        hoverColor: Colors.blueAccent);
   }
 }
