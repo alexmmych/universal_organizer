@@ -1,7 +1,6 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'color_theme.dart';
-import 'package:hive/hive.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   final ValueNotifier<Brightness> brightness;
@@ -20,6 +19,7 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
 
 class _TopBarState extends State<TopBar> {
   var theme = getNightMode();
+  var navRail = getNavRail();
 
   void changeTheme() {
     setState(() {
@@ -40,8 +40,13 @@ class _TopBarState extends State<TopBar> {
     });
   }
 
-  void showNavRail() {
-    setState(() {});
+  void changeNavRail() {
+    setState(() {
+      navRail = (getNavRail() ? false : true);
+      setNavRail(navRail);
+
+      print(navRail);
+    });
   }
 
   @override
@@ -53,7 +58,7 @@ class _TopBarState extends State<TopBar> {
           children: [
             Button(
                 theme: theme,
-                onPressed: showNavRail,
+                onPressed: changeNavRail,
                 icon: CupertinoIcons.bars),
           ],
         ),
@@ -111,18 +116,4 @@ class Button extends StatelessWidget {
       ),
     );
   }
-}
-
-BackgroundForeground getNightMode() {
-  var box = Hive.box('settings');
-
-  return (box.get('night_mode', defaultValue: false)
-      ? BackgroundForeground.nightTheme
-      : BackgroundForeground.dayTheme);
-}
-
-// Function to toggle night mode
-Future<void> setNightMode(bool isNightMode) async {
-  var box = Hive.box('settings');
-  await box.put('night_mode', isNightMode);
 }
