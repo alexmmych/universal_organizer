@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'base_class.dart';
 import 'theme_provider.dart';
+import 'nav_provider.dart';
 
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
@@ -11,8 +12,15 @@ void main() async {
   await Hive.initFlutter(); // Initialize Hive with Flutter
   await Hive.openBox('settings');
 
-  runApp(ChangeNotifierProvider(
-    create: (_) => ThemeProvider(),
+  runApp(MultiProvider(
+    providers: [
+      ChangeNotifierProvider(
+        create: (_) => ThemeProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => NavProvider(),
+      ),
+    ],
     child: const App(),
   ));
 }

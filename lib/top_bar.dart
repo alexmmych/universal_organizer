@@ -2,7 +2,7 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'theme_provider.dart';
-import 'globals.dart';
+import 'nav_provider.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   const TopBar({
@@ -17,25 +17,21 @@ class TopBar extends StatefulWidget implements PreferredSizeWidget {
 }
 
 class _TopBarState extends State<TopBar> {
-  var navRail = getNavRail();
-
-  void changeNavRail() {
-    setState(() {
-      navRail = (getNavRail() ? false : true);
-      setNavRail(navRail);
-    });
-  }
-
   @override
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
+    final navProvider = Provider.of<NavProvider>(context);
 
     return SafeArea(
       child: AppBar(
         backgroundColor: themeProvider.themeData.dividerColor,
         leading: Row(
           children: [
-            Button(onPressed: changeNavRail, icon: CupertinoIcons.bars),
+            Button(
+                onPressed: () {
+                  navProvider.toggleNavBar();
+                },
+                icon: CupertinoIcons.bars),
           ],
         ),
         title: const Text("Universal Organizer",
@@ -47,7 +43,7 @@ class _TopBarState extends State<TopBar> {
                   onPressed: () {
                     themeProvider.toggleTheme();
                   },
-                  icon: themeProvider.getCurrentTheme(context)
+                  icon: themeProvider.isDarkMode
                       ? CupertinoIcons.sun_max
                       : CupertinoIcons.moon),
               Button(onPressed: () => (), icon: CupertinoIcons.settings),
