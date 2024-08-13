@@ -22,6 +22,8 @@ class _NavRailState extends State<NavRail> {
   int selectedIndex = 0;
   late Widget mainPage;
 
+  double animatedWidth = 175;
+
   @override
   Widget build(BuildContext context) {
     switch (selectedIndex) {
@@ -39,40 +41,42 @@ class _NavRailState extends State<NavRail> {
     }
 
     final navProvider = Provider.of<NavProvider>(context);
-    Offset offset = const Offset(-2, 0);
 
     if (navProvider.isShown) {
-      offset = const Offset(0, 0);
+      animatedWidth = 175;
     } else {
-      offset = const Offset(-2, 0);
+      animatedWidth = 0;
     }
 
-    WidgetsBinding.instance!.addPostFrameCallback((_) => afterBuild());
+    WidgetsBinding.instance.addPostFrameCallback((_) => afterBuild());
 
     return SafeArea(
-      child: AnimatedSlide(
-        offset: offset,
+      child: AnimatedContainer(
         duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
-        child: NavigationRail(
-          backgroundColor: widget.theme.splashColor,
-          selectedIndex: selectedIndex,
-          extended: true,
-          onDestinationSelected: (value) {
-            setState(() {
-              selectedIndex = value;
-            });
-            widget.callback(mainPage);
-          },
-          destinations: const [
-            NavigationRailDestination(
-                icon: Icon(CupertinoIcons.calendar), label: Text('Calendar')),
-            NavigationRailDestination(
-                icon: Icon(CupertinoIcons.create), label: Text('Notes')),
-            NavigationRailDestination(
-                icon: Icon(CupertinoIcons.list_bullet),
-                label: Text('Reminders')),
-          ],
+        width: animatedWidth,
+        child: SingleChildScrollView(
+          scrollDirection: Axis.horizontal,
+          child: NavigationRail(
+            backgroundColor: widget.theme.splashColor,
+            selectedIndex: selectedIndex,
+            extended: true,
+            onDestinationSelected: (value) {
+              setState(() {
+                selectedIndex = value;
+              });
+              widget.callback(mainPage);
+            },
+            destinations: const [
+              NavigationRailDestination(
+                  icon: Icon(CupertinoIcons.calendar), label: Text('Calendar')),
+              NavigationRailDestination(
+                  icon: Icon(CupertinoIcons.create), label: Text('Notes')),
+              NavigationRailDestination(
+                  icon: Icon(CupertinoIcons.list_bullet),
+                  label: Text('Reminders')),
+            ],
+          ),
         ),
       ),
     );
