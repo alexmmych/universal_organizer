@@ -1,14 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
+import '../providers/nav_provider.dart';
+import 'package:provider/provider.dart';
+
 class NavRail extends StatefulWidget {
   const NavRail({
     super.key,
-    required this.offset,
     required this.theme,
   });
 
-  final Offset offset;
   final ThemeData theme;
 
   @override
@@ -20,9 +21,18 @@ class _NavRailState extends State<NavRail> {
 
   @override
   Widget build(BuildContext context) {
+    final navProvider = Provider.of<NavProvider>(context);
+    Offset offset = const Offset(-2, 0);
+
+    if (navProvider.isShown) {
+      offset = const Offset(0, 0);
+    } else {
+      offset = const Offset(-2, 0);
+    }
+
     return SafeArea(
       child: AnimatedSlide(
-        offset: widget.offset,
+        offset: offset,
         duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
         child: NavigationRail(
