@@ -47,7 +47,10 @@ class ThemeProvider extends ChangeNotifier {
           seedColor: _seedColor,
           brightness: isDarkMode ? Brightness.dark : Brightness.light,
         ),
-        highlightColor: Colors.blueAccent,
-        hoverColor: Colors.blueAccent);
+        highlightColor: _seedColor,
+        hoverColor: _seedColor,
+        splashColor: isDarkMode
+            ? const Color.fromARGB(255, 64, 66, 69)
+            : const Color.fromARGB(255, 220, 221, 221));
   }
 }
