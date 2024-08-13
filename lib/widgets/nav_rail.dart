@@ -1,32 +1,30 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
+import 'package:provider/provider.dart';
 
 import '../providers/nav_provider.dart';
-import 'package:provider/provider.dart';
 
 class NavRail extends StatefulWidget {
   const NavRail({
     super.key,
     required this.theme,
-    required this.callback,
   });
 
   final ThemeData theme;
-  final Function(Widget) callback;
 
   @override
   State<NavRail> createState() => _NavRailState();
 }
 
 class _NavRailState extends State<NavRail> {
-  int selectedIndex = 0;
   late Widget mainPage;
 
   double animatedWidth = 175;
 
   @override
   Widget build(BuildContext context) {
-    switch (selectedIndex) {
+    final navProvider = Provider.of<NavProvider>(context);
+    switch (navProvider.selectedIndex) {
       case 0:
         mainPage = const Placeholder(color: Colors.red);
         break;
@@ -37,18 +35,14 @@ class _NavRailState extends State<NavRail> {
         mainPage = const Placeholder(color: Colors.yellow);
         break;
       default:
-        throw UnimplementedError('no widget for $selectedIndex');
+        throw UnimplementedError('no widget for $navProvider');
     }
-
-    final navProvider = Provider.of<NavProvider>(context);
 
     if (navProvider.isShown) {
       animatedWidth = 175;
     } else {
       animatedWidth = 0;
     }
-
-    WidgetsBinding.instance.addPostFrameCallback((_) => afterBuild());
 
     return SafeArea(
       child: AnimatedContainer(
@@ -59,13 +53,10 @@ class _NavRailState extends State<NavRail> {
           scrollDirection: Axis.horizontal,
           child: NavigationRail(
             backgroundColor: widget.theme.splashColor,
-            selectedIndex: selectedIndex,
+            selectedIndex: navProvider.selectedIndex,
             extended: true,
             onDestinationSelected: (value) {
-              setState(() {
-                selectedIndex = value;
-              });
-              widget.callback(mainPage);
+              navProvider.setIndex(value);
             },
             destinations: const [
               NavigationRailDestination(
@@ -80,9 +71,5 @@ class _NavRailState extends State<NavRail> {
         ),
       ),
     );
-  }
-
-  void afterBuild() {
-    widget.callback(mainPage);
   }
 }

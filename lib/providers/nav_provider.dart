@@ -3,6 +3,7 @@ import 'package:hive/hive.dart';
 
 class NavProvider extends ChangeNotifier {
   bool isShown = false; // Default value
+  int selectedIndex = 0;
   late Box settingsBox; // Hive box for storing settings
 
   NavProvider() {
@@ -13,7 +14,15 @@ class NavProvider extends ChangeNotifier {
   void _loadSettings() async {
     settingsBox = await Hive.openBox('settings');
     isShown = settingsBox.get('isShown', defaultValue: false);
+    selectedIndex = settingsBox.get('selectedIndex', defaultValue: 0);
+
     notifyListeners(); // Notify listeners to rebuild UI with the loaded theme
+  }
+
+  void setIndex(value) {
+    selectedIndex = value;
+    settingsBox.put('selectedIndex', selectedIndex);
+    notifyListeners();
   }
 
   // Function to toggle between showing the navigational rails and not

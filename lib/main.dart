@@ -1,10 +1,11 @@
 import 'package:flutter/material.dart';
-import 'widgets/base_class.dart';
-import 'providers/theme_provider.dart';
-import 'providers/nav_provider.dart';
-
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+
+import 'widgets/base_class.dart';
+
+import 'providers/theme_provider.dart';
+import 'providers/nav_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
