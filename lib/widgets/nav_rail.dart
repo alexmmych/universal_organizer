@@ -8,9 +8,11 @@ class NavRail extends StatefulWidget {
   const NavRail({
     super.key,
     required this.theme,
+    required this.callback,
   });
 
   final ThemeData theme;
+  final Function(Widget) callback;
 
   @override
   State<NavRail> createState() => _NavRailState();
@@ -18,9 +20,24 @@ class NavRail extends StatefulWidget {
 
 class _NavRailState extends State<NavRail> {
   int selectedIndex = 0;
+  late Widget mainPage;
 
   @override
   Widget build(BuildContext context) {
+    switch (selectedIndex) {
+      case 0:
+        mainPage = const Placeholder(color: Colors.red);
+        break;
+      case 1:
+        mainPage = const Placeholder(color: Colors.green);
+        break;
+      case 2:
+        mainPage = const Placeholder(color: Colors.yellow);
+        break;
+      default:
+        throw UnimplementedError('no widget for $selectedIndex');
+    }
+
     final navProvider = Provider.of<NavProvider>(context);
     Offset offset = const Offset(-2, 0);
 
@@ -29,6 +46,8 @@ class _NavRailState extends State<NavRail> {
     } else {
       offset = const Offset(-2, 0);
     }
+
+    WidgetsBinding.instance!.addPostFrameCallback((_) => afterBuild());
 
     return SafeArea(
       child: AnimatedSlide(
@@ -39,10 +58,11 @@ class _NavRailState extends State<NavRail> {
           backgroundColor: widget.theme.splashColor,
           selectedIndex: selectedIndex,
           extended: true,
-          onDestinationSelected: (value) => {
+          onDestinationSelected: (value) {
             setState(() {
               selectedIndex = value;
-            })
+            });
+            widget.callback(mainPage);
           },
           destinations: const [
             NavigationRailDestination(
@@ -56,5 +76,9 @@ class _NavRailState extends State<NavRail> {
         ),
       ),
     );
+  }
+
+  void afterBuild() {
+    widget.callback(mainPage);
   }
 }
