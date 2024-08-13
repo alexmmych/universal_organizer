@@ -41,14 +41,16 @@ class ThemeProvider extends ChangeNotifier {
   // Create the ThemeData based on the current state
   ThemeData _createThemeData() {
     return ThemeData(
-      useMaterial3: true,
-      brightness: isDarkMode ? Brightness.dark : Brightness.light,
-      colorScheme: ColorScheme.fromSeed(
-        seedColor: _seedColor,
+        useMaterial3: true,
         brightness: isDarkMode ? Brightness.dark : Brightness.light,
-      ),
-      highlightColor: _seedColor,
-      hoverColor: _seedColor,
-    );
+        colorScheme: ColorScheme.fromSeed(
+          seedColor: _seedColor,
+          brightness: isDarkMode ? Brightness.dark : Brightness.light,
+        ),
+        highlightColor: _seedColor,
+        hoverColor: _seedColor,
+        splashColor: isDarkMode
+            ? const Color.fromARGB(255, 64, 66, 69)
+            : const Color.fromARGB(255, 220, 221, 221));
   }
 }
