@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/cupertino.dart';
 
-class NavRail extends StatelessWidget {
+class NavRail extends StatefulWidget {
   const NavRail({
     super.key,
     required this.offset,
@@ -12,16 +12,28 @@ class NavRail extends StatelessWidget {
   final ThemeData theme;
 
   @override
+  State<NavRail> createState() => _NavRailState();
+}
+
+class _NavRailState extends State<NavRail> {
+  int selectedIndex = 0;
+
+  @override
   Widget build(BuildContext context) {
     return SafeArea(
       child: AnimatedSlide(
-        offset: offset,
+        offset: widget.offset,
         duration: const Duration(seconds: 1),
         curve: Curves.easeInOut,
         child: NavigationRail(
-          backgroundColor: theme.splashColor,
-          selectedIndex: 0,
+          backgroundColor: widget.theme.splashColor,
+          selectedIndex: selectedIndex,
           extended: true,
+          onDestinationSelected: (value) => {
+            setState(() {
+              selectedIndex = value;
+            })
+          },
           destinations: const [
             NavigationRailDestination(
                 icon: Icon(CupertinoIcons.calendar), label: Text('Calendar')),
