@@ -24,19 +24,6 @@ class _NavRailState extends State<NavRail> {
   @override
   Widget build(BuildContext context) {
     final navProvider = Provider.of<NavProvider>(context);
-    switch (navProvider.selectedIndex) {
-      case 0:
-        mainPage = const Placeholder(color: Colors.red);
-        break;
-      case 1:
-        mainPage = const Placeholder(color: Colors.green);
-        break;
-      case 2:
-        mainPage = const Placeholder(color: Colors.yellow);
-        break;
-      default:
-        throw UnimplementedError('no widget for $navProvider');
-    }
 
     if (navProvider.isShown) {
       animatedWidth = 175;

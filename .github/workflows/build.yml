@@ -9,6 +9,7 @@ jobs:
     uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@main
   build-android:
     needs: wait-analyze
+    environment: Android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,7 +22,9 @@ jobs:
           channel: "stable"
           architecture: x64
       - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      - run: flutter build apk --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --release --split-per-abi
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -58,6 +61,7 @@ jobs:
 
   build-web:
     needs: wait-analyze
+    environment: Web
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -66,7 +70,10 @@ jobs:
           channel: "stable"
           architecture: x64
       - run: flutter pub get
-      - run: flutter build web
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build web --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
       - name: Upload Web Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -75,6 +82,7 @@ jobs:
 
   build-linux:
     needs: wait-analyze
+    environment: Desktop
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -98,7 +106,10 @@ jobs:
             libprotobuf-dev \
             protobuf-compiler
       - run: flutter pub get
-      - run: flutter build linux
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build linux --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
       - name: Upload Linux Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -107,6 +118,7 @@ jobs:
 
   build-macos:
     needs: wait-analyze
+    environment: Desktop
     runs-on: macos-latest
     steps:
       - uses: actions/checkout@v4
@@ -115,7 +127,10 @@ jobs:
           channel: "stable"
           architecture: x64
       - run: flutter pub get
-      - run: flutter build macos
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build macos --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
       - name: Upload macOS Artifacts
         uses: actions/upload-artifact@v3
         with:
@@ -124,6 +139,7 @@ jobs:
 
   build-windows:
     needs: wait-analyze
+    environment: Desktop
     runs-on: windows-latest
     steps:
       - uses: actions/checkout@v4
@@ -132,7 +148,10 @@ jobs:
           channel: "stable"
           architecture: x64
       - run: flutter pub get
-      - run: flutter build windows
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build windows --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
       - name: Upload Windows Artifacts
         uses: actions/upload-artifact@v3
         with:

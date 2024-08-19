@@ -5,6 +5,7 @@ import '../providers/nav_provider.dart';
 
 import 'top_bar.dart';
 import 'nav_rail.dart';
+import 'google_calendar.dart';
 
 class BaseClass extends StatefulWidget {
   const BaseClass({
@@ -26,7 +27,7 @@ class _BaseClassState extends State<BaseClass> {
     final navProvider = Provider.of<NavProvider>(context);
     switch (navProvider.selectedIndex) {
       case 0:
-        mainPage = const Placeholder(color: Colors.red);
+        mainPage = const GoogleCalendar();
         break;
       case 1:
         mainPage = const Placeholder(color: Colors.green);
