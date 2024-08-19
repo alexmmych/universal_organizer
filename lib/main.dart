@@ -12,6 +12,8 @@ void main() async {
 
   await Hive.initFlutter(); // Initialize Hive with Flutter
   await Hive.openBox('settings');
+  await Hive.openBox('google_user');
+  await Hive.openBox('reminders');
 
   runApp(MultiProvider(
     providers: [

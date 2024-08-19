@@ -7,8 +7,67 @@ on:
 jobs:
   wait-analyze:
     uses: alexmmych/universal_organizer/.github/workflows/analyze.yml@main
+
+  build-web:
+    needs: wait-analyze
+    environment: Web
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build web --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+      - name: Upload Web Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: web-build
+          path: build/web
+
+  build-linux:
+    needs: wait-analyze
+    environment: Desktop
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - name: Install dependencies
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y \
+            cmake \
+            pkg-config \
+            clang \
+            ninja-build \
+            libgtk-3-dev \
+            libblkid-dev \
+            liblzma-dev \
+            liblz4-dev \
+            libssl-dev \
+            libprotobuf-dev \
+            protobuf-compiler
+      - run: flutter pub get
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build linux --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+      - name: Upload Linux Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: linux-build
+          path: build/linux/x64/release/bundle
+
   build-android:
     needs: wait-analyze
+    environment: Android
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -21,12 +80,35 @@ jobs:
           channel: "stable"
           architecture: x64
       - run: flutter pub get
-      - run: flutter build apk --release --split-per-abi
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+      - run: flutter build apk --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --release --split-per-abi
       - name: Upload APK Artifacts
         uses: actions/upload-artifact@v3
         with:
           name: android-apk
           path: build/app/outputs/flutter-apk/*.apk
+
+  build-windows:
+    needs: wait-analyze
+    environment: Desktop
+    runs-on: windows-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: subosito/flutter-action@v2
+        with:
+          channel: "stable"
+          architecture: x64
+      - run: flutter pub get
+        env:
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+      - run: flutter build windows --dart-define=CLIENT_ID=${{ secrets.CLIENT_ID }} --dart-define=CLIENT_SECRET=${{ secrets.CLIENT_SECRET }}
+      - name: Upload Windows Artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: windows-build
+          path: build/windows/x64/runner/Release
 
   build-ios:
     needs: wait-analyze
@@ -55,86 +137,3 @@ jobs:
         with:
           name: ios-ipa
           path: build/ios/iphoneos/app.ipa
-
-  build-web:
-    needs: wait-analyze
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          architecture: x64
-      - run: flutter pub get
-      - run: flutter build web
-      - name: Upload Web Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: web-build
-          path: build/web
-
-  build-linux:
-    needs: wait-analyze
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          architecture: x64
-      - name: Install dependencies
-        run: |
-          sudo apt-get update
-          sudo apt-get install -y \
-            cmake \
-            pkg-config \
-            clang \
-            ninja-build \
-            libgtk-3-dev \
-            libblkid-dev \
-            liblzma-dev \
-            liblz4-dev \
-            libssl-dev \
-            libprotobuf-dev \
-            protobuf-compiler
-      - run: flutter pub get
-      - run: flutter build linux
-      - name: Upload Linux Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: linux-build
-          path: build/linux/x64/release/bundle
-
-  build-macos:
-    needs: wait-analyze
-    runs-on: macos-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          architecture: x64
-      - run: flutter pub get
-      - run: flutter build macos
-      - name: Upload macOS Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: macos-build
-          path: build/macos/Build/Products/Release
-
-  build-windows:
-    needs: wait-analyze
-    runs-on: windows-latest
-    steps:
-      - uses: actions/checkout@v4
-      - uses: subosito/flutter-action@v2
-        with:
-          channel: "stable"
-          architecture: x64
-      - run: flutter pub get
-      - run: flutter build windows
-      - name: Upload Windows Artifacts
-        uses: actions/upload-artifact@v3
-        with:
-          name: windows-build
-          path: build/windows/x64/runner/Release
