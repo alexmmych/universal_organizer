@@ -1,12 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
+import 'package:universal_organizer/widgets/moving_container/settings.dart';
 
 import 'top_bar.dart';
 import 'moving_container/moving_container.dart';
 import 'moving_container/nav_rail.dart';
 import 'google_calendar.dart';
 
-import '../providers/nav_provider.dart';
+import '../providers/moving_provider/nav_provider.dart';
+import '../providers/moving_provider/settings_provider.dart';
 
 class BaseClass extends StatefulWidget {
   const BaseClass({
@@ -48,6 +50,9 @@ class _BaseClassState extends State<BaseClass> {
               childAnimatedContainer: NavRail(theme: widget.theme),
               requestedProvider: Provider.of<NavProvider>(context)),
           Expanded(child: mainPage ?? const Placeholder(color: Colors.purple)),
+          MovingContainer(
+              childAnimatedContainer: Settings(theme: widget.theme),
+              requestedProvider: Provider.of<SettingsProvider>(context)),
         ]),
       ),
     );

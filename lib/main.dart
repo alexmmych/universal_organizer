@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
-import 'package:universal_organizer/providers/moving_provider.dart';
+import 'package:universal_organizer/providers/moving_provider/moving_provider.dart';
+import 'package:universal_organizer/providers/moving_provider/settings_provider.dart';
 
 import 'widgets/base_class.dart';
 
 import 'providers/theme_provider.dart';
-import 'providers/moving_provider.dart';
-import 'providers/nav_provider.dart';
+import 'providers/moving_provider/nav_provider.dart';
 
 void main() async {
   // ChatGPT best practice recommendation for ensureInitialized
@@ -29,6 +29,9 @@ void main() async {
       ),
       ChangeNotifierProvider(
         create: (_) => NavProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => SettingsProvider(),
       ),
     ],
     child: const App(),

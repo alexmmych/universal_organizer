@@ -3,7 +3,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/theme_provider.dart';
-import '../providers/nav_provider.dart';
+import '../providers/moving_provider/nav_provider.dart';
+import '../providers/moving_provider/settings_provider.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   const TopBar({
@@ -22,6 +23,7 @@ class _TopBarState extends State<TopBar> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final navProvider = Provider.of<NavProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
 
     return SafeArea(
       child: AppBar(
@@ -47,7 +49,11 @@ class _TopBarState extends State<TopBar> {
                   icon: themeProvider.isDarkMode
                       ? CupertinoIcons.sun_max
                       : CupertinoIcons.moon),
-              Button(onPressed: () => (), icon: CupertinoIcons.settings),
+              Button(
+                  onPressed: () {
+                    settingsProvider.toggle();
+                  },
+                  icon: CupertinoIcons.settings),
               // Small space between the buttons and the edge of the screen
               const SizedBox(width: 10.0),
             ],
