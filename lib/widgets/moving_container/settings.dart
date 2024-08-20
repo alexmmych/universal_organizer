@@ -22,19 +22,54 @@ class _SettingsState extends State<Settings> {
   Widget build(BuildContext context) {
     final settingsProvider = Provider.of<SettingsProvider>(context);
 
-    return Center(
-      child: SingleChildScrollView(
-        scrollDirection: Axis.horizontal,
-        child: Column(
-          children: [
-            CircleAvatar(
-              foregroundImage: NetworkImage(settingsProvider.pictureURI),
-            ),
-            Text(
-              "Hello ${settingsProvider.name}",
-              textAlign: TextAlign.center,
-            )
-          ],
+    // Code adapted with ChatGPT so the text doesn't overflow when the animation happens
+    return Container(
+      color: widget.theme.splashColor,
+      child: Center(
+        child: LayoutBuilder(
+          builder: (context, constraints) {
+            return SingleChildScrollView(
+              scrollDirection: Axis.horizontal,
+              child: ConstrainedBox(
+                constraints: BoxConstraints(
+                  maxWidth: constraints
+                      .maxWidth, // Ensure the Column does not exceed maxWidth
+                ),
+                child: IntrinsicWidth(
+                  child: Column(
+                    mainAxisSize: MainAxisSize.max,
+                    children: [
+                      const SizedBox(
+                        height: 30.0,
+                      ),
+                      CircleAvatar(
+                        radius: 50.0,
+                        foregroundImage:
+                            NetworkImage(settingsProvider.pictureURI),
+                      ),
+                      const SizedBox(
+                        height: 10.0,
+                      ),
+                      // Wrap Text in Flexible to handle different container sizes
+                      Flexible(
+                        child: FittedBox(
+                          fit: BoxFit.scaleDown,
+                          child: Text(
+                            "Hello ${settingsProvider.name}!",
+                            textAlign: TextAlign.center,
+                            style: const TextStyle(
+                              fontSize: 20,
+                              fontWeight: FontWeight.bold,
+                            ),
+                          ),
+                        ),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+            );
+          },
         ),
       ),
     );
