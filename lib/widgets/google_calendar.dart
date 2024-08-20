@@ -72,16 +72,7 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
           http.Client(),
         );
 
-        // Suggested by ChatGPT and then modified accordingly
-        final response = await _client!
-            .get(Uri.parse('https://www.googleapis.com/oauth2/v2/userinfo'));
-        if (response.statusCode == 200) {
-          final profile = json.decode(response.body);
-          box.put('name', profile['name']);
-          box.put('picture', profile['picture']);
-        } else {
-          throw Exception('Failed to load profile info');
-        }
+        await _getUserProfile(box);
 
         // Check to see whether the google calendar scope was granted or not
         if (!credentials.scopes!
@@ -100,6 +91,19 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
         _isLoading = false;
       });
       _showSignInDialog(); // Show the sign-in dialog if silent sign-in fails
+    }
+  }
+
+  Future<void> _getUserProfile(Box<dynamic> box) async {
+    // Suggested by ChatGPT and then modified accordingly
+    final response = await _client!
+        .get(Uri.parse('https://www.googleapis.com/oauth2/v2/userinfo'));
+    if (response.statusCode == 200) {
+      final profile = json.decode(response.body);
+      box.put('name', profile['name']);
+      box.put('picture', profile['picture']);
+    } else {
+      throw Exception('Failed to load profile info');
     }
   }
 
@@ -176,6 +180,8 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
 
           final box = Hive.box('google_user');
           box.put('credentials', credentials.toJson());
+
+          await _getUserProfile(box);
 
           _fetchGoogleEvents();
 

@@ -6,6 +6,8 @@ class SettingsProvider extends MovingProvider {
   String name = "";
   String pictureURI = "";
 
+  late Box googleUser;
+
   SettingsProvider() {
     _loadSettings(); // Load settings from Hive on initialization
   }
@@ -15,11 +17,16 @@ class SettingsProvider extends MovingProvider {
     box = await Hive.openBox('settings');
     isShown = box.get('isShown', defaultValue: false);
 
-    var googleUser = await Hive.openBox("google_user");
+    googleUser = await Hive.openBox("google_user");
 
     name = googleUser.get("name");
     pictureURI = googleUser.get("picture");
 
     notifyListeners(); // Notify listeners to rebuild UI with the loaded theme
+  }
+
+  void logout() async {
+    await googleUser.clear();
+    notifyListeners();
   }
 }

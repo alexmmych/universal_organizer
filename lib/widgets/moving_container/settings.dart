@@ -80,7 +80,9 @@ class _SettingsState extends State<Settings> {
                           label: const Text("Log Out",
                               style: TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold)),
-                          onPressed: () => (),
+                          onPressed: () {
+                            settingsProvider.logout();
+                          },
                         ),
                       ),
                     ],
