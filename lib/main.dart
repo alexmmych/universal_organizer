@@ -8,6 +8,7 @@ import 'providers/theme_provider.dart';
 import 'providers/nav_provider.dart';
 
 void main() async {
+  // ChatGPT best practice recommendation for ensureInitialized
   WidgetsFlutterBinding.ensureInitialized();
 
   await Hive.initFlutter(); // Initialize Hive with Flutter
@@ -15,6 +16,7 @@ void main() async {
   await Hive.openBox('google_user');
   await Hive.openBox('reminders');
 
+  //MultiProvider suggested by ChatGPT when asked how to have several ChangeNotifier Providers
   runApp(MultiProvider(
     providers: [
       ChangeNotifierProvider(

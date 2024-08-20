@@ -1,11 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/nav_provider.dart';
-
 import 'top_bar.dart';
 import 'nav_rail.dart';
 import 'google_calendar.dart';
+
+import '../providers/nav_provider.dart';
 
 class BaseClass extends StatefulWidget {
   const BaseClass({
