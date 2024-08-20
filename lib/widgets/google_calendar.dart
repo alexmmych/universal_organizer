@@ -11,7 +11,7 @@ import 'package:http/io_client.dart' show IOClient, IOStreamedResponse;
 import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:url_launcher/url_launcher.dart';
-import 'package:hive_flutter/hive_flutter.dart';
+import 'package:hive/hive.dart';
 
 // These two conflict with each other and require separate definitions because of it
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;

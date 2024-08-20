@@ -30,7 +30,7 @@ class _TopBarState extends State<TopBar> {
           children: [
             Button(
                 onPressed: () {
-                  navProvider.toggleNavBar();
+                  navProvider.toggle();
                 },
                 icon: CupertinoIcons.bars),
           ],

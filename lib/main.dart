@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 import 'package:provider/provider.dart';
+import 'package:universal_organizer/providers/moving_provider.dart';
 
 import 'widgets/base_class.dart';
 
 import 'providers/theme_provider.dart';
+import 'providers/moving_provider.dart';
 import 'providers/nav_provider.dart';
 
 void main() async {
@@ -21,6 +23,9 @@ void main() async {
     providers: [
       ChangeNotifierProvider(
         create: (_) => ThemeProvider(),
+      ),
+      ChangeNotifierProvider(
+        create: (_) => MovingProvider(),
       ),
       ChangeNotifierProvider(
         create: (_) => NavProvider(),

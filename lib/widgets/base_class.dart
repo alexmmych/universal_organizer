@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
 import 'top_bar.dart';
-import 'nav_rail.dart';
+import 'moving_container/moving_container.dart';
+import 'moving_container/nav_rail.dart';
 import 'google_calendar.dart';
 
 import '../providers/nav_provider.dart';
@@ -43,7 +44,9 @@ class _BaseClassState extends State<BaseClass> {
       home: Scaffold(
         appBar: const TopBar(),
         body: Row(children: [
-          NavRail(theme: widget.theme),
+          MovingContainer(
+              childAnimatedContainer: NavRail(theme: widget.theme),
+              requestedProvider: Provider.of<NavProvider>(context)),
           Expanded(child: mainPage ?? const Placeholder(color: Colors.purple)),
         ]),
       ),
