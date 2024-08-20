@@ -1,7 +1,7 @@
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
+import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
-import 'package:cupertino_icons/cupertino_icons.dart';
 
 import '../../providers/moving_provider/settings_provider.dart';
 import '../../providers/theme_provider.dart';
@@ -44,11 +44,23 @@ class _SettingsState extends State<Settings> {
                       const SizedBox(
                         height: 30.0,
                       ),
-                      CircleAvatar(
-                        radius: 50.0,
-                        foregroundImage:
-                            NetworkImage(settingsProvider.pictureURI),
-                      ),
+                      settingsProvider.loggedIn
+                          ? CircleAvatar(
+                              radius: 50.0,
+                              foregroundImage:
+                                  NetworkImage(settingsProvider.pictureURI),
+                              child:
+                                  Text(settingsProvider.name[0].toUpperCase()))
+                          : Container(
+                              height: 80,
+                              width: 80,
+                              decoration: BoxDecoration(
+                                color: widget.theme.highlightColor,
+                                borderRadius:
+                                    const BorderRadius.all(Radius.circular(50)),
+                              ),
+                              child: const Icon(CupertinoIcons.person),
+                            ),
                       const SizedBox(
                         height: 10.0,
                       ),
@@ -56,7 +68,9 @@ class _SettingsState extends State<Settings> {
                       FittedBox(
                         fit: BoxFit.scaleDown,
                         child: Text(
-                          "Hello ${settingsProvider.name}!",
+                          settingsProvider.loggedIn
+                              ? "Hello ${settingsProvider.name}!"
+                              : "You aren't logged in",
                           textAlign: TextAlign.center,
                           style: const TextStyle(
                             fontSize: 20,
@@ -75,13 +89,19 @@ class _SettingsState extends State<Settings> {
                             foregroundColor:
                                 themeProvider.getOppositeColor(context),
                           ),
-                          icon: const Icon(CupertinoIcons.square_arrow_left,
+                          icon: Icon(
+                              settingsProvider.loggedIn
+                                  ? CupertinoIcons.square_arrow_left
+                                  : CupertinoIcons.square_arrow_right,
                               size: 20.0),
-                          label: const Text("Log Out",
-                              style: TextStyle(
+                          label: Text(
+                              settingsProvider.loggedIn ? "Log Out" : "Log In",
+                              style: const TextStyle(
                                   fontSize: 15, fontWeight: FontWeight.bold)),
                           onPressed: () {
-                            settingsProvider.logout();
+                            settingsProvider.loggedIn
+                                ? settingsProvider.logout()
+                                : settingsProvider.login();
                           },
                         ),
                       ),
