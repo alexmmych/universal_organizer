@@ -2,7 +2,8 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
-import 'text_button_icon.dart';
+import 'package:provider/provider.dart';
+import '../providers/theme_provider.dart';
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -18,46 +19,46 @@ class _NotesState extends State<Notes> {
 
   @override
   Widget build(BuildContext context) {
+    final themeProvider = Provider.of<ThemeProvider>(context);
+
     return Scaffold(
         body: Wrap(children: [
-      TextButtonIcon(
-          icon: CupertinoIcons.add_circled,
-          text: "Create note",
-          onPressed: () {
-            newFile();
-          }),
-      const SizedBox(
-        height: 50.0,
+      Padding(
+        padding: const EdgeInsets.all(8.0),
+        child: TextButton.icon(
+            style: TextButton.styleFrom(
+              backgroundColor: themeProvider.themeData.highlightColor,
+              foregroundColor: themeProvider.getOppositeColor(context),
+            ),
+            icon: const Icon(CupertinoIcons.add_circled, size: 20.0),
+            label: const Text("Create note",
+                style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+            onPressed: () {
+              setState(() {
+                _creatingNewFile = !_creatingNewFile;
+              });
+            }),
       ),
       _creatingNewFile
           ? Container(
-              color: Colors.red,
-              child: TextFormField(
-                decoration: const InputDecoration(
-                    labelText: "Name", fillColor: Colors.red),
-              ),
+              color: themeProvider.themeData.splashColor,
+              child: Column(children: [
+                TextFormField(
+                  decoration: const InputDecoration(
+                    labelText: "Name",
+                  ),
+                ),
+                Container(
+                  child: TextFormField(
+                    decoration: const InputDecoration(
+                      labelText: "Contents...",
+                    ),
+                  ),
+                ),
+              ]),
             )
           : Column(),
     ]));
-  }
-
-  void newFile() {
-    // var files;
-
-    // if (box.isNotEmpty) {
-    //   files = box.get('files');
-    // } else {
-    //   files = <File>[];
-    // }
-
-    setState(() {
-      _creatingNewFile = !_creatingNewFile;
-    });
-
-    // File file = File("Test", "Ok");
-    // files.add(file);
-
-    // box.put('files', files);
   }
 }
 
