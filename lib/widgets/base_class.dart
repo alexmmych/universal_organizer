@@ -6,6 +6,7 @@ import 'top_bar.dart';
 import 'moving_container/moving_container.dart';
 import 'moving_container/nav_rail.dart';
 import 'google_calendar.dart';
+import 'notes.dart';
 
 import '../providers/moving_provider/nav_provider.dart';
 import '../providers/moving_provider/settings_provider.dart';
@@ -33,7 +34,7 @@ class _BaseClassState extends State<BaseClass> {
         mainPage = const GoogleCalendar();
         break;
       case 1:
-        mainPage = const Placeholder(color: Colors.green);
+        mainPage = const Notes();
         break;
       case 2:
         mainPage = const Placeholder(color: Colors.yellow);

@@ -19,6 +19,7 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 
 import 'package:provider/provider.dart';
 import '../providers/moving_provider/settings_provider.dart';
+import '../providers/moving_provider/nav_provider.dart';
 
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});
@@ -252,6 +253,13 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   Widget build(BuildContext context) {
     // Necessary logic for the calendar and settings to be in sync
     final settingsProvider = Provider.of<SettingsProvider>(context);
+    final navProvider = Provider.of<NavProvider>(context);
+
+    if (settingsProvider.loggedIn &&
+        navProvider.selectedIndex == 0 &&
+        _events == null) {
+      _signInSilently();
+    }
 
     if (!settingsProvider.loggedIn && _isLoading) {
       _signInSilently();

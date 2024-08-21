@@ -16,6 +16,7 @@ void main() async {
   await Hive.initFlutter(); // Initialize Hive with Flutter
   await Hive.openBox('settings');
   await Hive.openBox('google_user');
+  await Hive.openBox('notes');
   await Hive.openBox('reminders');
 
   //MultiProvider suggested by ChatGPT when asked how to have several ChangeNotifier Providers
