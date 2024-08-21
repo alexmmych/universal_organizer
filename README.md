@@ -26,7 +26,7 @@ I used Flutter not necessarily because it can also build for mobile because I ca
 
 ## Screenshots
 
-![App Screenshot](resources\screenshot.png)
+![App Screenshot](resources/screenshot.png)
 
 
 ## Features
