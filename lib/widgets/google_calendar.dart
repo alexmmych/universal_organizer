@@ -17,6 +17,9 @@ import 'package:hive/hive.dart';
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:oauth2/oauth2.dart' as oauth2;
 
+import 'package:provider/provider.dart';
+import '../providers/moving_provider/settings_provider.dart';
+
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});
 
@@ -29,6 +32,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   auth.AutoRefreshingAuthClient? _client;
   bool _isLoading = true;
   bool _isDialogShown = false;
+  late Uri _authorizationUrl;
+  late Box box;
+  late oauth2.Credentials _credentials;
   List<calendar_api.Event>? _events;
 
   @override
@@ -46,15 +52,11 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
       Uri.parse('https://oauth2.googleapis.com/token'),
       secret: clientSecret,
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _signInSilently();
-    });
   }
 
   Future<void> _signInSilently() async {
     try {
-      final box = Hive.box('google_user');
+      box = await Hive.openBox('google_user');
       final credentialsJson = box.get('credentials');
 
       if (credentialsJson != null) {
@@ -143,47 +145,39 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
       });
 
       // Generate the authorization URL
-      final authorizationUrl = _grant.getAuthorizationUrl(
-        Uri.parse('http://localhost:8080/'),
-        scopes: [
-          'https://www.googleapis.com/auth/userinfo.profile',
-          calendar_api.CalendarApi.calendarScope,
-        ],
-      );
-
+      try {
+        _authorizationUrl = _grant.getAuthorizationUrl(
+          Uri.parse('http://localhost:8080/'),
+          scopes: [
+            'https://www.googleapis.com/auth/userinfo.profile',
+            calendar_api.CalendarApi.calendarScope,
+          ],
+        );
+      } catch (_) {}
       // Launch the URL for user to authorize
-      await launchUrl(authorizationUrl, mode: LaunchMode.externalApplication);
-
+      await launchUrl(_authorizationUrl, mode: LaunchMode.inAppWebView);
       // Start a server to handle the redirect URI
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
       server.listen((HttpRequest request) async {
         final code = request.uri.queryParameters['code'];
         if (code != null) {
-          // Exchange the authorization code for credentials
-          final tempCredentials =
-              await _grant.handleAuthorizationResponse({'code': code});
-
-          final credentials = tempCredentials.credentials;
+          try {
+            // Exchange the authorization code for credentials
+            final tempCredentials =
+                await _grant.handleAuthorizationResponse({'code': code});
+            _credentials = tempCredentials.credentials;
+          } catch (_) {}
 
           // Create an AutoRefreshingAuthClient using the credentials
           _client = auth.autoRefreshingClient(
               auth.ClientId(_grant.identifier, _grant.secret),
               auth.AccessCredentials(
-                  auth.AccessToken('Bearer', credentials.accessToken,
-                      credentials.expiration!.toUtc()),
-                  credentials.refreshToken,
-                  credentials.scopes!,
-                  idToken: credentials.idToken),
+                  auth.AccessToken('Bearer', _credentials.accessToken,
+                      _credentials.expiration!.toUtc()),
+                  _credentials.refreshToken,
+                  _credentials.scopes!,
+                  idToken: _credentials.idToken),
               http.Client());
-
-          // Save credentials to Hive box so we can use it later
-
-          final box = Hive.box('google_user');
-          box.put('credentials', credentials.toJson());
-
-          await _getUserProfile(box);
-
-          _fetchGoogleEvents();
 
           // Send a response to the browser
           final response = request.response;
@@ -192,6 +186,13 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
             ..write('You can close this window.')
             ..close();
         }
+
+        final box = Hive.box('google_user');
+        box.put('credentials', _credentials.toJson());
+
+        await _getUserProfile(box);
+
+        _fetchGoogleEvents();
 
         await server.close();
       });
@@ -221,6 +222,10 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     _handleSignIn();
+                    setState(() {
+                      _isLoading =
+                          false; // Ensure loading is stopped if user cancels
+                    });
                   },
                 ),
                 TextButton(
@@ -245,8 +250,28 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
 
   @override
   Widget build(BuildContext context) {
+    // Necessary logic for the calendar and settings to be in sync
+    final settingsProvider = Provider.of<SettingsProvider>(context);
+
+    if (!settingsProvider.loggedIn && _isLoading) {
+      _signInSilently();
+    } else if (!settingsProvider.loggedIn) {
+      setState(() {
+        if (box.isEmpty) {
+          _events = null;
+        } else {
+          settingsProvider.login();
+        }
+      });
+    }
+
+    if (settingsProvider.requestLogIn) {
+      _signInSilently();
+      settingsProvider.requestLogIn = false;
+    }
+
     return Scaffold(
-        body: _isLoading
+        body: (_isLoading)
             ? const Center(child: CircularProgressIndicator())
             : SfCalendar(
                 view: CalendarView.month,

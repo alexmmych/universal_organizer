@@ -7,9 +7,9 @@ class SettingsProvider extends MovingProvider {
   String pictureURI = "";
 
   bool loggedIn = false;
+  bool requestLogIn = false;
 
   late Box googleUser;
-  late Box _googleUserCache;
 
   SettingsProvider() {
     _loadSettings(); // Load settings from Hive on initialization
@@ -21,7 +21,6 @@ class SettingsProvider extends MovingProvider {
     isShown = box.get('isShown', defaultValue: false);
 
     googleUser = await Hive.openBox("google_user");
-    _googleUserCache = await Hive.openBox("google_user_cache");
 
     final credentialsJson = googleUser.get('credentials');
 
@@ -29,20 +28,14 @@ class SettingsProvider extends MovingProvider {
       name = googleUser.get("name");
       pictureURI = googleUser.get("picture");
       loggedIn = true;
+    } else {
+      loggedIn = false;
     }
 
     notifyListeners(); // Notify listeners to rebuild UI with the loaded theme
   }
 
-  void _transferBetweenBoxes(boxA, boxB) async {
-    for (var key in boxA) {
-      var value = boxA.get(key);
-      await boxB.put(key, value);
-    }
-  }
-
   void logout() async {
-    _transferBetweenBoxes(googleUser, _googleUserCache);
     await googleUser.clear();
 
     loggedIn = false;
@@ -50,10 +43,14 @@ class SettingsProvider extends MovingProvider {
   }
 
   void login() async {
-    _transferBetweenBoxes(_googleUserCache, googleUser);
-    await _googleUserCache.clear();
+    _loadSettings();
 
-    loggedIn = true;
+    if (loggedIn == false) {
+      requestLogIn = true;
+    } else {
+      requestLogIn = false;
+    }
+
     notifyListeners();
   }
 }
