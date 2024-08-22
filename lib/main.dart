@@ -5,6 +5,7 @@ import 'package:universal_organizer/providers/moving_provider/moving_provider.da
 import 'package:universal_organizer/providers/moving_provider/settings_provider.dart';
 
 import 'widgets/base_class.dart';
+import 'widgets/file.dart';
 
 import 'providers/theme_provider.dart';
 import 'providers/moving_provider/nav_provider.dart';
@@ -15,9 +16,12 @@ void main() async {
 
   await Hive.initFlutter(); // Initialize Hive with Flutter
   await Hive.openBox('settings');
+  await Hive.openBox('navigation_settings');
   await Hive.openBox('google_user');
-  await Hive.openBox('notes');
   await Hive.openBox('reminders');
+
+  Hive.registerAdapter<File>(FileAdapter());
+  await Hive.openBox<File>("notes");
 
   //MultiProvider suggested by ChatGPT when asked how to have several ChangeNotifier Providers
   runApp(MultiProvider(

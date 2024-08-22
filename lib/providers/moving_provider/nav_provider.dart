@@ -11,7 +11,7 @@ class NavProvider extends MovingProvider {
 
   // Load settings from Hive
   void _loadSettings() async {
-    box = await Hive.openBox('navigation_settings');
+    box = Hive.box('navigation_settings');
     isShown = box.get('isShown', defaultValue: false);
     selectedIndex = box.get('selectedIndex', defaultValue: 0);
 

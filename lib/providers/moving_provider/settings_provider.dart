@@ -16,7 +16,7 @@ class SettingsProvider extends MovingProvider {
   }
 
   // Load settings from Hive
-  void _loadSettings() async {
+  Future<void> _loadSettings() async {
     box = await Hive.openBox('settings');
     isShown = box.get('isShown', defaultValue: false);
 
@@ -42,14 +42,13 @@ class SettingsProvider extends MovingProvider {
     notifyListeners();
   }
 
-  void login() async {
-    _loadSettings();
+  void requestLogin() async {
+    requestLogIn = true;
+    notifyListeners();
+  }
 
-    if (loggedIn == false) {
-      requestLogIn = true;
-    } else {
-      requestLogIn = false;
-    }
+  void login() async {
+    await _loadSettings();
 
     notifyListeners();
   }

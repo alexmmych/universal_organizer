@@ -100,7 +100,7 @@ class _SettingsState extends State<Settings> {
                           onPressed: () {
                             settingsProvider.loggedIn
                                 ? settingsProvider.logout()
-                                : settingsProvider.login();
+                                : settingsProvider.requestLogin();
                           },
                         ),
                       ),

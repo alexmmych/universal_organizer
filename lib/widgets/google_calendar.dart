@@ -19,7 +19,6 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 
 import 'package:provider/provider.dart';
 import '../providers/moving_provider/settings_provider.dart';
-import '../providers/moving_provider/nav_provider.dart';
 
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});
@@ -33,8 +32,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   auth.AutoRefreshingAuthClient? _client;
   bool _isLoading = true;
   bool _isDialogShown = false;
+  bool _isSigningIn = false;
   late Uri _authorizationUrl;
-  late Box box;
+  Box box = Hive.box("google_user");
   late oauth2.Credentials _credentials;
   List<calendar_api.Event>? _events;
 
@@ -57,7 +57,6 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
 
   Future<void> _signInSilently() async {
     try {
-      box = await Hive.openBox('google_user');
       final credentialsJson = box.get('credentials');
 
       if (credentialsJson != null) {
@@ -84,6 +83,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
         }
 
         _fetchGoogleEvents();
+        setState(() {
+          _isSigningIn = true;
+        });
       } else {
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
           _showSignInDialog();
@@ -92,6 +94,7 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
     } catch (error) {
       setState(() {
         _isLoading = false;
+        _isSigningIn = false;
       });
       _showSignInDialog(); // Show the sign-in dialog if silent sign-in fails
     }
@@ -111,30 +114,32 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   }
 
   Future<void> _fetchGoogleEvents() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      if (_client != null) {
-        final calendarApi = calendar_api.CalendarApi(_client!);
-        final calEvents = await calendarApi.events.list("primary");
-        final appointments = <calendar_api.Event>[];
-        if (calEvents.items != null) {
-          for (final event in calEvents.items!) {
-            if (event.start != null) {
-              appointments.add(event);
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        if (_client != null) {
+          final calendarApi = calendar_api.CalendarApi(_client!);
+          final calEvents = await calendarApi.events.list("primary");
+          final appointments = <calendar_api.Event>[];
+          if (calEvents.items != null) {
+            for (final event in calEvents.items!) {
+              if (event.start != null) {
+                appointments.add(event);
+              }
             }
           }
+          setState(() {
+            _events = appointments;
+            _isLoading = false;
+          });
         }
+      } catch (e) {
         setState(() {
-          _events = appointments;
           _isLoading = false;
         });
       }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
     }
   }
 
@@ -200,6 +205,7 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
     } finally {
       setState(() {
         _isLoading = false;
+        _isSigningIn = false;
       });
     }
   }
@@ -209,6 +215,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
     if (!_isDialogShown) {
       _isDialogShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _isSigningIn = true;
+        });
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -224,8 +233,8 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
                     Navigator.of(context).pop();
                     _handleSignIn();
                     setState(() {
-                      _isLoading =
-                          false; // Ensure loading is stopped if user cancels
+                      // Ensure loading is stopped if user cancels
+                      _isSigningIn = true;
                     });
                   },
                 ),
@@ -234,8 +243,8 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
-                      _isLoading =
-                          false; // Ensure loading is stopped if user cancels
+                      // Ensure loading is stopped if user cancels
+                      _isSigningIn = false;
                     });
                   },
                 ),
@@ -243,6 +252,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
             );
           },
         ).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
           _isDialogShown = false;
         });
       });
@@ -251,44 +263,43 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    // Necessary logic for the calendar and settings to be in sync
-    final settingsProvider = Provider.of<SettingsProvider>(context);
-    final navProvider = Provider.of<NavProvider>(context);
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
+        Box navBox = Hive.box('navigation_settings');
+        int selectedIndex = navBox.get('selectedIndex', defaultValue: 0);
 
-    if (settingsProvider.loggedIn &&
-        navProvider.selectedIndex == 0 &&
-        _events == null) {
-      _signInSilently();
-    }
+        if (selectedIndex == 0 && _isLoading == true && _isSigningIn == false) {
+          _signInSilently();
+        }
 
-    if (!settingsProvider.loggedIn && _isLoading) {
-      _signInSilently();
-    } else if (!settingsProvider.loggedIn) {
-      setState(() {
-        if (box.isEmpty) {
-          _events = null;
-        } else {
+        if (settingsProvider.requestLogIn == true && _isSigningIn == false) {
+          _signInSilently();
+          settingsProvider.requestLogIn = false;
+        }
+
+        if (_events != null && !settingsProvider.loggedIn) {
           settingsProvider.login();
         }
-      });
-    }
 
-    if (settingsProvider.requestLogIn) {
-      _signInSilently();
-      settingsProvider.requestLogIn = false;
-    }
+        if (box.isEmpty) {
+          _events = null;
+          _isSigningIn = false;
+        }
 
-    return Scaffold(
-        body: (_isLoading)
-            ? const Center(child: CircularProgressIndicator())
-            : SfCalendar(
-                view: CalendarView.month,
-                dataSource: GoogleDataSource(events: _events),
-                monthViewSettings: const MonthViewSettings(
-                  appointmentDisplayMode:
-                      MonthAppointmentDisplayMode.appointment,
+        return Scaffold(
+          body: (_isLoading)
+              ? const Center(child: CircularProgressIndicator())
+              : SfCalendar(
+                  view: CalendarView.month,
+                  dataSource: GoogleDataSource(events: _events),
+                  monthViewSettings: const MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment,
+                  ),
                 ),
-              ));
+        );
+      },
+    );
   }
 }
 
