@@ -209,7 +209,11 @@ class _NotesState extends State<Notes> {
                                 type: MaterialType.button,
                                 child: ListTile(
                                   onTap: () {
-                                    print("Open file");
+                                    setState(() {
+                                      _nameController.text = item.name;
+                                      _contentController.text = item.content;
+                                      _creatingNewFile = !_creatingNewFile;
+                                    });
                                   },
                                   title: Text(item.name),
                                   trailing: const Handle(
