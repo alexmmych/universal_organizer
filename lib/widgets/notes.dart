@@ -1,3 +1,5 @@
+import 'dart:ui';
+
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
@@ -5,6 +7,9 @@ import 'package:hive/hive.dart';
 import 'package:provider/provider.dart';
 import '../providers/theme_provider.dart';
 import 'file.dart';
+
+import 'package:animated_list_plus/animated_list_plus.dart';
+import 'package:animated_list_plus/transitions.dart';
 
 class Notes extends StatefulWidget {
   const Notes({super.key});
@@ -141,9 +146,87 @@ class _NotesState extends State<Notes> {
                       ),
                     ),
                   )
-                : ListView(children: [
-                    for (File file in box.values.toList()) (Text(file.name))
-                  ]), // Empty container when not creating a new file
+                : ImplicitlyAnimatedReorderableList<File>(
+                    items: box.values.toList(growable: true),
+                    areItemsTheSame: (oldItem, newItem) =>
+                        oldItem.name == newItem.name,
+                    onReorderFinished: (item, from, to, newItems) {
+                      setState(() {
+                        final movedItem = box.getAt(from)!.copy;
+
+                        if (from < to) {
+                          // If moving down, shift other items up
+                          for (int i = from; i < to; i++) {
+                            final nextItem = box.getAt(i + 1)!.copy;
+                            box.putAt(i, nextItem);
+                          }
+                        } else {
+                          // If moving up, shift other items down
+                          for (int i = from; i > to; i--) {
+                            final prevItem = box.getAt(i - 1)!.copy;
+                            box.putAt(i, prevItem);
+                          }
+                        }
+
+                        // Finally, place the moved item in the target position
+                        box.putAt(to, movedItem);
+                      });
+                    },
+                    removeItemBuilder: (context, animation, oldItem) {
+                      return Reorderable(
+                        key: ValueKey(oldItem),
+                        child: FadeTransition(
+                          opacity: animation,
+                          child: Text(oldItem.name),
+                        ),
+                      );
+                    },
+                    itemBuilder: (context, itemAnimation, item, index) {
+                      // Each item must be wrapped in a Reorderable widget.
+                      return Reorderable(
+                        // Each item must have an unique key.
+                        key: ValueKey(item),
+                        builder: (context, dragAnimation, inDrag) {
+                          final t = dragAnimation.value;
+                          final elevation = lerpDouble(0, 8, t);
+                          final color = Color.lerp(
+                              themeProvider.themeData.splashColor,
+                              themeProvider.themeData.splashColor
+                                  .withOpacity(0.8),
+                              t);
+
+                          return SizeFadeTransition(
+                            sizeFraction: 0.7,
+                            curve: Curves.easeInOut,
+                            animation: itemAnimation,
+                            child: Padding(
+                              padding:
+                                  const EdgeInsets.fromLTRB(8.0, 2.5, 8.0, 2.5),
+                              child: Material(
+                                color: color,
+                                borderRadius: BorderRadius.circular(12.0),
+                                elevation: elevation!,
+                                type: MaterialType.button,
+                                child: ListTile(
+                                  onTap: () {
+                                    print("Open file");
+                                  },
+                                  title: Text(item.name),
+                                  trailing: const Handle(
+                                    delay: Duration(milliseconds: 50),
+                                    child: Icon(
+                                      Icons.list,
+                                      color: Colors.grey,
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ),
+                          );
+                        },
+                      );
+                    },
+                  ), // Empty container when not creating a new file
           ),
         ],
       ),
