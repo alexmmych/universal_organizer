@@ -20,6 +20,7 @@ void main() async {
   await Hive.openBox('navigation_settings');
   await Hive.openBox('google_user');
 
+  // Required for File type to work as it needs an adapter for Hive
   Hive.registerAdapter<File>(FileAdapter());
   await Hive.openBox<File>("notes");
 
