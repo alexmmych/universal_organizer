@@ -14,7 +14,8 @@ void main() async {
   // ChatGPT best practice recommendation for ensureInitialized
   WidgetsFlutterBinding.ensureInitialized();
 
-  await Hive.initFlutter(); // Initialize Hive with Flutter
+  await Hive.initFlutter(
+      "universal_organizer_data"); // Initialize Hive with Flutter
   await Hive.openBox('settings');
   await Hive.openBox('navigation_settings');
   await Hive.openBox('google_user');

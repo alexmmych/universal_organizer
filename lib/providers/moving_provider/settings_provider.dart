@@ -31,8 +31,6 @@ class SettingsProvider extends MovingProvider {
     } else {
       loggedIn = false;
     }
-
-    notifyListeners(); // Notify listeners to rebuild UI with the loaded theme
   }
 
   void logout() async {
