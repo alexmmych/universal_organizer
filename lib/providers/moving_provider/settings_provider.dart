@@ -17,10 +17,10 @@ class SettingsProvider extends MovingProvider {
 
   // Load settings from Hive
   Future<void> _loadSettings() async {
-    box = await Hive.openBox('settings');
+    box = Hive.box('settings');
     isShown = box.get('isShown', defaultValue: false);
 
-    googleUser = await Hive.openBox("google_user");
+    googleUser = Hive.box("google_user");
 
     final credentialsJson = googleUser.get('credentials');
 

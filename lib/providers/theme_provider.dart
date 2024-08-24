@@ -14,7 +14,7 @@ class ThemeProvider extends ChangeNotifier {
 
   // Load settings from Hive
   void _loadSettings() async {
-    settingsBox = await Hive.openBox('settings');
+    settingsBox = Hive.box('settings');
     isDarkMode = settingsBox.get('isDarkMode', defaultValue: false);
     notifyListeners(); // Notify listeners to rebuild UI with the loaded theme
   }
