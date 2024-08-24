@@ -5,8 +5,8 @@ import 'package:flutter/material.dart';
 import 'package:hive/hive.dart';
 
 import 'package:provider/provider.dart';
-import '../providers/theme_provider.dart';
-import 'file.dart';
+import '../../providers/theme_provider.dart';
+import '../reusable_widgets/file.dart';
 
 import 'package:animated_list_plus/animated_list_plus.dart';
 import 'package:animated_list_plus/transitions.dart';

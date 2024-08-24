@@ -18,7 +18,7 @@ import 'package:googleapis_auth/googleapis_auth.dart' as auth;
 import 'package:oauth2/oauth2.dart' as oauth2;
 
 import 'package:provider/provider.dart';
-import '../providers/moving_provider/settings_provider.dart';
+import '../../providers/moving_provider/settings_provider.dart';
 
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});

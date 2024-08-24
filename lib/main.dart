@@ -4,8 +4,8 @@ import 'package:provider/provider.dart';
 import 'package:universal_organizer/providers/moving_provider/moving_provider.dart';
 import 'package:universal_organizer/providers/moving_provider/settings_provider.dart';
 
-import 'widgets/base_class.dart';
-import 'widgets/file.dart';
+import 'widgets/main_widgets/base_class.dart';
+import 'widgets/reusable_widgets/file.dart';
 
 import 'providers/theme_provider.dart';
 import 'providers/moving_provider/nav_provider.dart';

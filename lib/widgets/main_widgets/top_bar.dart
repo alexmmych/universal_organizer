@@ -2,10 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/theme_provider.dart';
-import '../providers/moving_provider/nav_provider.dart';
-import '../providers/moving_provider/settings_provider.dart';
-import 'button.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/moving_provider/nav_provider.dart';
+import '../../providers/moving_provider/settings_provider.dart';
+import '../reusable_widgets/button.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   const TopBar({
