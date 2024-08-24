@@ -63,6 +63,7 @@ class _SettingsState extends State<Settings> {
                       const SizedBox(
                         height: 10.0,
                       ),
+                      // FittedBox idea so the settings don't overlap on the animation generated with ChatGPT
                       // Wrap Text in Flexible to handle different container sizes
                       FittedBox(
                         fit: BoxFit.scaleDown,
