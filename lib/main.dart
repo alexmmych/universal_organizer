@@ -19,7 +19,6 @@ void main() async {
   await Hive.openBox('settings');
   await Hive.openBox('navigation_settings');
   await Hive.openBox('google_user');
-  await Hive.openBox('reminders');
 
   Hive.registerAdapter<File>(FileAdapter());
   await Hive.openBox<File>("notes");
