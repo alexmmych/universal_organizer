@@ -25,8 +25,8 @@ class SettingsProvider extends MovingProvider {
     final credentialsJson = googleUser.get('credentials');
 
     if (credentialsJson != null) {
-      name = googleUser.get("name");
-      pictureURI = googleUser.get("picture");
+      name = googleUser.get("name", defaultValue: "");
+      pictureURI = googleUser.get("picture", defaultValue: "");
       loggedIn = true;
     } else {
       loggedIn = false;

@@ -26,6 +26,9 @@ class _NotesState extends State<Notes> {
   final TextEditingController _nameController = TextEditingController();
   final TextEditingController _contentController = TextEditingController();
 
+  // Key used to delete object from Hive on deletion
+  dynamic _currentFileKey;
+
   @override
   void dispose() {
     // Dispose the controllers when the widget is disposed
@@ -100,25 +103,12 @@ class _NotesState extends State<Notes> {
                               children: [
                                 ElevatedButton(
                                   style: ElevatedButton.styleFrom(
-                                    backgroundColor: Colors.red,
-                                  ),
+                                      backgroundColor: themeProvider
+                                          .themeData.highlightColor,
+                                      foregroundColor: Colors.black,
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
                                   onPressed: () {
-                                    // Cancel the creation process
-                                    setState(() {
-                                      _creatingNewFile = false;
-                                      _nameController.clear();
-                                      _contentController.clear();
-                                    });
-                                  },
-                                  child: const Text("Cancel"),
-                                ),
-                                ElevatedButton(
-                                  style: ElevatedButton.styleFrom(
-                                    backgroundColor:
-                                        themeProvider.themeData.primaryColor,
-                                  ),
-                                  onPressed: () {
-                                    // Save the note and reset the form
                                     final String name = _nameController.text;
                                     final String content =
                                         _contentController.text;
@@ -127,8 +117,19 @@ class _NotesState extends State<Notes> {
                                       File newFile =
                                           File(name: name, content: content);
 
-                                      // Add the new file to the Hive box or perform any other saving operation
-                                      box.add(newFile);
+                                      File checkExistingFile =
+                                          box.values.toList().firstWhere(
+                                                (item) =>
+                                                    item.name == newFile.name,
+                                                orElse: () => newFile,
+                                              );
+
+                                      if (checkExistingFile == newFile) {
+                                        box.add(newFile);
+                                      } else {
+                                        checkExistingFile.name = name;
+                                        checkExistingFile.content = content;
+                                      }
 
                                       setState(() {
                                         _creatingNewFile = false;
@@ -138,6 +139,34 @@ class _NotesState extends State<Notes> {
                                     }
                                   },
                                   child: const Text("Save"),
+                                ),
+                                ElevatedButton(
+                                  onPressed: () {
+                                    setState(() {
+                                      _creatingNewFile = false;
+                                      _nameController.clear();
+                                      _contentController.clear();
+                                    });
+                                  },
+                                  child: const Text("Cancel"),
+                                ),
+                                ElevatedButton(
+                                  // ElevatedButton(
+                                  style: ElevatedButton.styleFrom(
+                                      backgroundColor: Colors.red,
+                                      foregroundColor: Colors.black,
+                                      textStyle: const TextStyle(
+                                          fontWeight: FontWeight.bold)),
+                                  onPressed: () {
+                                    box.delete(_currentFileKey);
+
+                                    setState(() {
+                                      _creatingNewFile = false;
+                                      _nameController.clear();
+                                      _contentController.clear();
+                                    });
+                                  },
+                                  child: const Text("Delete"),
                                 ),
                               ],
                             ),
@@ -154,6 +183,7 @@ class _NotesState extends State<Notes> {
                       setState(() {
                         final movedItem = box.getAt(from)!.copy;
 
+                        //ChatGPT used for the logic to skip over several files if more than 3 are present
                         if (from < to) {
                           // If moving down, shift other items up
                           for (int i = from; i < to; i++) {
@@ -210,6 +240,7 @@ class _NotesState extends State<Notes> {
                                 child: ListTile(
                                   onTap: () {
                                     setState(() {
+                                      _currentFileKey = item.key;
                                       _nameController.text = item.name;
                                       _contentController.text = item.content;
                                       _creatingNewFile = !_creatingNewFile;

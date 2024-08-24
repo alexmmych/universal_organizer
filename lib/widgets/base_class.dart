@@ -36,9 +36,6 @@ class _BaseClassState extends State<BaseClass> {
       case 1:
         mainPage = const Notes();
         break;
-      case 2:
-        mainPage = const Placeholder(color: Colors.yellow);
-        break;
       default:
         throw UnimplementedError('no widget for $navProvider');
     }

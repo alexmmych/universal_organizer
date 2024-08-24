@@ -35,8 +35,6 @@ class _NavRailState extends State<NavRail> {
               icon: Icon(CupertinoIcons.calendar), label: Text('Calendar')),
           NavigationRailDestination(
               icon: Icon(CupertinoIcons.create), label: Text('Notes')),
-          NavigationRailDestination(
-              icon: Icon(CupertinoIcons.list_bullet), label: Text('Reminders')),
         ],
       ),
     );
