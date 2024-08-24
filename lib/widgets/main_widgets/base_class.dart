@@ -1,11 +1,15 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-
-import '../providers/nav_provider.dart';
+import 'package:universal_organizer/widgets/moving_container/settings.dart';
 
 import 'top_bar.dart';
-import 'nav_rail.dart';
+import '../moving_container/moving_container.dart';
+import '../moving_container/nav_rail.dart';
 import 'google_calendar.dart';
+import 'notes.dart';
+
+import '../../providers/moving_provider/nav_provider.dart';
+import '../../providers/moving_provider/settings_provider.dart';
 
 class BaseClass extends StatefulWidget {
   const BaseClass({
@@ -30,10 +34,7 @@ class _BaseClassState extends State<BaseClass> {
         mainPage = const GoogleCalendar();
         break;
       case 1:
-        mainPage = const Placeholder(color: Colors.green);
-        break;
-      case 2:
-        mainPage = const Placeholder(color: Colors.yellow);
+        mainPage = const Notes();
         break;
       default:
         throw UnimplementedError('no widget for $navProvider');
@@ -43,8 +44,13 @@ class _BaseClassState extends State<BaseClass> {
       home: Scaffold(
         appBar: const TopBar(),
         body: Row(children: [
-          NavRail(theme: widget.theme),
+          MovingContainer(
+              childAnimatedContainer: NavRail(theme: widget.theme),
+              requestedProvider: Provider.of<NavProvider>(context)),
           Expanded(child: mainPage ?? const Placeholder(color: Colors.purple)),
+          MovingContainer(
+              childAnimatedContainer: Settings(theme: widget.theme),
+              requestedProvider: Provider.of<SettingsProvider>(context)),
         ]),
       ),
     );

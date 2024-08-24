@@ -2,8 +2,10 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
-import '../providers/theme_provider.dart';
-import '../providers/nav_provider.dart';
+import '../../providers/theme_provider.dart';
+import '../../providers/moving_provider/nav_provider.dart';
+import '../../providers/moving_provider/settings_provider.dart';
+import '../reusable_widgets/button.dart';
 
 class TopBar extends StatefulWidget implements PreferredSizeWidget {
   const TopBar({
@@ -22,6 +24,7 @@ class _TopBarState extends State<TopBar> {
   Widget build(BuildContext context) {
     final themeProvider = Provider.of<ThemeProvider>(context);
     final navProvider = Provider.of<NavProvider>(context);
+    final settingsProvider = Provider.of<SettingsProvider>(context);
 
     return SafeArea(
       child: AppBar(
@@ -30,7 +33,7 @@ class _TopBarState extends State<TopBar> {
           children: [
             Button(
                 onPressed: () {
-                  navProvider.toggleNavBar();
+                  navProvider.toggle();
                 },
                 icon: CupertinoIcons.bars),
           ],
@@ -47,42 +50,16 @@ class _TopBarState extends State<TopBar> {
                   icon: themeProvider.isDarkMode
                       ? CupertinoIcons.sun_max
                       : CupertinoIcons.moon),
-              Button(onPressed: () => (), icon: CupertinoIcons.settings),
+              Button(
+                  onPressed: () {
+                    settingsProvider.toggle();
+                  },
+                  icon: CupertinoIcons.settings),
               // Small space between the buttons and the edge of the screen
               const SizedBox(width: 10.0),
             ],
           ),
         ],
-      ),
-    );
-  }
-}
-
-class Button extends StatelessWidget {
-  const Button({
-    super.key,
-    required this.icon,
-    required this.onPressed,
-  });
-
-  final VoidCallback onPressed;
-  final IconData icon;
-
-  @override
-  Widget build(BuildContext context) {
-    final themeProvider = Provider.of<ThemeProvider>(context);
-    return SizedBox(
-      height: 40.0,
-      child: FloatingActionButton(
-        onPressed: onPressed,
-        shape: const CircleBorder(),
-        backgroundColor: themeProvider.themeData.dialogBackgroundColor,
-        hoverColor: themeProvider.themeData.hoverColor,
-        splashColor: themeProvider.themeData.splashColor,
-        child: Icon(
-          icon,
-          color: themeProvider.getOppositeColor(context),
-        ),
       ),
     );
   }

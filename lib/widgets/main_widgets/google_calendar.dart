@@ -1,13 +1,24 @@
+// Most of this code is an adaptation of https://github.com/SyncfusionExamples/add-google-event-calendar-to-flutter-event-calendar
+// The repo used only demonstrated how to connect the two together, but didn't account on how to show sign in dialogs and how to log in silently
+
+// Imports were organized and using ChatGPT
 import 'dart:io';
+import 'dart:convert';
+
 import 'package:flutter/material.dart';
-import 'package:googleapis/calendar/v3.dart' as google_api;
+import 'package:googleapis/calendar/v3.dart' as calendar_api;
 import 'package:http/io_client.dart' show IOClient, IOStreamedResponse;
-import 'package:http/http.dart' as http; // Corrected import
+import 'package:http/http.dart' as http;
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import 'package:url_launcher/url_launcher.dart';
+import 'package:hive/hive.dart';
+
+// These two conflict with each other and require separate definitions because of it
 import 'package:googleapis_auth/googleapis_auth.dart' as auth;
-import 'package:oauth2/oauth2.dart' as oauth2; // Ensure proper usage of oauth2
-import 'package:hive_flutter/hive_flutter.dart'; // Store user in hive box
+import 'package:oauth2/oauth2.dart' as oauth2;
+
+import 'package:provider/provider.dart';
+import '../../providers/moving_provider/settings_provider.dart';
 
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});
@@ -21,7 +32,11 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   auth.AutoRefreshingAuthClient? _client;
   bool _isLoading = true;
   bool _isDialogShown = false;
-  List<google_api.Event>? _events;
+  bool _isSigningIn = false;
+  late Uri _authorizationUrl;
+  Box box = Hive.box("google_user");
+  late oauth2.Credentials _credentials;
+  List<calendar_api.Event>? _events;
 
   @override
   void initState() {
@@ -38,15 +53,10 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
       Uri.parse('https://oauth2.googleapis.com/token'),
       secret: clientSecret,
     );
-
-    WidgetsBinding.instance.addPostFrameCallback((_) {
-      _signInSilently();
-    });
   }
 
   Future<void> _signInSilently() async {
     try {
-      final box = Hive.box('google_user');
       final credentialsJson = box.get('credentials');
 
       if (credentialsJson != null) {
@@ -64,7 +74,18 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
           http.Client(),
         );
 
+        await _getUserProfile(box);
+
+        // Check to see whether the google calendar scope was granted or not
+        if (!credentials.scopes!
+            .contains(calendar_api.CalendarApi.calendarScope)) {
+          throw Exception("Calendar scope not granted");
+        }
+
         _fetchGoogleEvents();
+        setState(() {
+          _isSigningIn = true;
+        });
       } else {
         if (Platform.isWindows || Platform.isLinux || Platform.isMacOS) {
           _showSignInDialog();
@@ -73,39 +94,56 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
     } catch (error) {
       setState(() {
         _isLoading = false;
+        _isSigningIn = false;
       });
       _showSignInDialog(); // Show the sign-in dialog if silent sign-in fails
     }
   }
 
-  Future<void> _fetchGoogleEvents() async {
-    setState(() {
-      _isLoading = true;
-    });
-    try {
-      if (_client != null) {
-        final calendarApi = google_api.CalendarApi(_client!);
-        final calEvents = await calendarApi.events.list("primary");
-        final appointments = <google_api.Event>[];
-        if (calEvents.items != null) {
-          for (final event in calEvents.items!) {
-            if (event.start != null) {
-              appointments.add(event);
-            }
-          }
-        }
-        setState(() {
-          _events = appointments;
-          _isLoading = false;
-        });
-      }
-    } catch (e) {
-      setState(() {
-        _isLoading = false;
-      });
+  Future<void> _getUserProfile(Box<dynamic> box) async {
+    // Suggested by ChatGPT and then modified accordingly
+    final response = await _client!
+        .get(Uri.parse('https://www.googleapis.com/oauth2/v2/userinfo'));
+    if (response.statusCode == 200) {
+      final profile = json.decode(response.body);
+      box.put('name', profile['name']);
+      box.put('picture', profile['picture']);
+    } else {
+      throw Exception('Failed to load profile info');
     }
   }
 
+  Future<void> _fetchGoogleEvents() async {
+    if (mounted) {
+      setState(() {
+        _isLoading = true;
+      });
+      try {
+        if (_client != null) {
+          final calendarApi = calendar_api.CalendarApi(_client!);
+          final calEvents = await calendarApi.events.list("primary");
+          final appointments = <calendar_api.Event>[];
+          if (calEvents.items != null) {
+            for (final event in calEvents.items!) {
+              if (event.start != null) {
+                appointments.add(event);
+              }
+            }
+          }
+          setState(() {
+            _events = appointments;
+            _isLoading = false;
+          });
+        }
+      } catch (e) {
+        setState(() {
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Authorization boilerplate generated by ChatGPT
   Future<void> _handleSignIn() async {
     try {
       setState(() {
@@ -113,42 +151,39 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
       });
 
       // Generate the authorization URL
-      final authorizationUrl = _grant.getAuthorizationUrl(
-        Uri.parse('http://localhost:8080/'),
-        scopes: [google_api.CalendarApi.calendarScope],
-      );
-
+      try {
+        _authorizationUrl = _grant.getAuthorizationUrl(
+          Uri.parse('http://localhost:8080/'),
+          scopes: [
+            'https://www.googleapis.com/auth/userinfo.profile',
+            calendar_api.CalendarApi.calendarScope,
+          ],
+        );
+      } catch (_) {}
       // Launch the URL for user to authorize
-      await launchUrl(authorizationUrl, mode: LaunchMode.externalApplication);
-
+      await launchUrl(_authorizationUrl, mode: LaunchMode.inAppWebView);
       // Start a server to handle the redirect URI
       final server = await HttpServer.bind(InternetAddress.loopbackIPv4, 8080);
       server.listen((HttpRequest request) async {
         final code = request.uri.queryParameters['code'];
         if (code != null) {
-          // Exchange the authorization code for credentials
-          final tempCredentials =
-              await _grant.handleAuthorizationResponse({'code': code});
-
-          final credentials = tempCredentials.credentials;
+          try {
+            // Exchange the authorization code for credentials
+            final tempCredentials =
+                await _grant.handleAuthorizationResponse({'code': code});
+            _credentials = tempCredentials.credentials;
+          } catch (_) {}
 
           // Create an AutoRefreshingAuthClient using the credentials
           _client = auth.autoRefreshingClient(
               auth.ClientId(_grant.identifier, _grant.secret),
               auth.AccessCredentials(
-                  auth.AccessToken('Bearer', credentials.accessToken,
-                      credentials.expiration!.toUtc()),
-                  credentials.refreshToken,
-                  credentials.scopes!,
-                  idToken: credentials.idToken),
+                  auth.AccessToken('Bearer', _credentials.accessToken,
+                      _credentials.expiration!.toUtc()),
+                  _credentials.refreshToken,
+                  _credentials.scopes!,
+                  idToken: _credentials.idToken),
               http.Client());
-
-          // Save credentials to Hive box so we can use it later
-
-          final box = Hive.box('google_user');
-          box.put('credentials', credentials.toJson());
-
-          _fetchGoogleEvents();
 
           // Send a response to the browser
           final response = request.response;
@@ -158,19 +193,31 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
             ..close();
         }
 
+        final box = Hive.box('google_user');
+        box.put('credentials', _credentials.toJson());
+
+        await _getUserProfile(box);
+
+        _fetchGoogleEvents();
+
         await server.close();
       });
     } finally {
       setState(() {
         _isLoading = false;
+        _isSigningIn = false;
       });
     }
   }
 
+  // The SignInDialog was created using ChatGPT
   void _showSignInDialog() {
     if (!_isDialogShown) {
       _isDialogShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
+        setState(() {
+          _isSigningIn = true;
+        });
         showDialog(
           context: context,
           barrierDismissible: false,
@@ -185,6 +232,10 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     _handleSignIn();
+                    setState(() {
+                      // Ensure loading is stopped if user cancels
+                      _isSigningIn = true;
+                    });
                   },
                 ),
                 TextButton(
@@ -192,8 +243,8 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
                   onPressed: () {
                     Navigator.of(context).pop();
                     setState(() {
-                      _isLoading =
-                          false; // Ensure loading is stopped if user cancels
+                      // Ensure loading is stopped if user cancels
+                      _isSigningIn = false;
                     });
                   },
                 ),
@@ -201,6 +252,9 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
             );
           },
         ).then((_) {
+          setState(() {
+            _isLoading = false;
+          });
           _isDialogShown = false;
         });
       });
@@ -209,28 +263,54 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator())
-            : SfCalendar(
-                view: CalendarView.month,
-                dataSource: GoogleDataSource(events: _events),
-                monthViewSettings: const MonthViewSettings(
-                  appointmentDisplayMode:
-                      MonthAppointmentDisplayMode.appointment,
+    return Consumer<SettingsProvider>(
+      builder: (context, settingsProvider, child) {
+        Box navBox = Hive.box('navigation_settings');
+        int selectedIndex = navBox.get('selectedIndex', defaultValue: 0);
+
+        if (selectedIndex == 0 && _isLoading == true && _isSigningIn == false) {
+          _signInSilently();
+        }
+
+        if (settingsProvider.requestLogIn == true && _isSigningIn == false) {
+          _signInSilently();
+          settingsProvider.requestLogIn = false;
+        }
+
+        if (_events != null && !settingsProvider.loggedIn) {
+          settingsProvider.login();
+        }
+
+        if (box.isEmpty) {
+          _events = null;
+          _isSigningIn = false;
+        }
+
+        return Scaffold(
+          body: (_isLoading)
+              ? const Center(child: CircularProgressIndicator())
+              : SfCalendar(
+                  view: CalendarView.month,
+                  dataSource: GoogleDataSource(events: _events),
+                  monthViewSettings: const MonthViewSettings(
+                    appointmentDisplayMode:
+                        MonthAppointmentDisplayMode.appointment,
+                  ),
                 ),
-              ));
+        );
+      },
+    );
   }
 }
 
 class GoogleDataSource extends CalendarDataSource {
-  GoogleDataSource({required List<google_api.Event>? events}) {
+  GoogleDataSource({required List<calendar_api.Event>? events}) {
     appointments = events;
   }
 
   @override
   DateTime getStartTime(int index) {
-    final google_api.Event event = appointments![index];
+    final calendar_api.Event event = appointments![index];
     return event.start?.date ?? event.start!.dateTime!.toLocal();
   }
 
@@ -241,7 +321,7 @@ class GoogleDataSource extends CalendarDataSource {
 
   @override
   DateTime getEndTime(int index) {
-    final google_api.Event event = appointments![index];
+    final calendar_api.Event event = appointments![index];
     return event.endTimeUnspecified != null && event.endTimeUnspecified!
         ? (event.start?.date ?? event.start!.dateTime!.toLocal())
         : (event.end?.date != null
@@ -261,7 +341,7 @@ class GoogleDataSource extends CalendarDataSource {
 
   @override
   String getSubject(int index) {
-    final google_api.Event event = appointments![index];
+    final calendar_api.Event event = appointments![index];
     return event.summary == null || event.summary!.isEmpty
         ? 'No Title'
         : event.summary!;

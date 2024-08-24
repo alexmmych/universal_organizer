@@ -6,7 +6,6 @@ CS50 2024 Final Project by Alexander Maykl Mychlo
 ## Runs on:
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
-
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
 ## Author
 
@@ -27,7 +26,7 @@ I used Flutter not necessarily because it can also build for mobile because I ca
 
 ## Screenshots
 
-![App Screenshot](https://via.placeholder.com/468x300?text=App+Screenshot+Here)
+![App Screenshot](resources/screenshot.png)
 
 
 ## Features
@@ -42,10 +41,9 @@ I used Flutter not necessarily because it can also build for mobile because I ca
 
  - [Add Google Event Calendar to Flutter Event Calendar (SyncFusion)](https://github.com/SyncfusionExamples/add-google-event-calendar-to-flutter-event-calendar)
  - [readme.so](https://readme.so/)
- - ChatGPT was used for boilerplate code and setting up the calendar
 
 
 ## 🔗 Links
-[![Github](https://img.shields.io/badge/linkedin-12100E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alexmmych/)
-[![linkedin](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/)
+[![Github](https://img.shields.io/badge/github-12100E?style=for-the-badge&logo=github&logoColor=white)](https://github.com/alexmmych/)
+[![LinkedIn](https://img.shields.io/badge/linkedin-0A66C2?style=for-the-badge&logo=linkedin&logoColor=white)](https://www.linkedin.com/)
 

@@ -24,10 +24,11 @@ dependencies:
   syncfusion_flutter_calendar: ^26.2.9
   intl: ^0.19.0
   google_sign_in: ^6.2.1
+  animated_list_plus: ^0.5.2
 
 dev_dependencies:
   build_runner: ^2.4.11
-
+  hive_generator: ^1.0.0
   flutter_lints: ^4.0.0
 
 flutter:
