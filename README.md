@@ -1,13 +1,14 @@
 
 # Universal Organizer
 
+#### Video Demo: http://www.youtube.com/watch?v=VTw6lx5-SqA
+#### Description:
+
 CS50 2024 Final Project by Alexander Maykl Mychlo Dolinin
 
 ## CS50 Final Project Video
 
-<video controls>
-  <source src="resources/final_project.mp4" type="video/mp4">
-</video>
+[![IMAGE ALT TEXT](http://img.youtube.com/vi/VTw6lx5-SqA/0.jpg)](http://www.youtube.com/watch?v=VTw6lx5-SqA "Video Title")
 
 ## Runs on:
 
