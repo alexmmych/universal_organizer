@@ -1,12 +1,19 @@
 
 # Universal Organizer
 
-CS50 2024 Final Project by Alexander Maykl Mychlo
+CS50 2024 Final Project by Alexander Maykl Mychlo Dolinin
+
+## CS50 Final Project Video
+
+<video controls>
+  <source src="resources/final_project.mp4" type="video/mp4">
+</video>
 
 ## Runs on:
 
 ![Linux](https://img.shields.io/badge/Linux-FCC624?style=for-the-badge&logo=linux&logoColor=black)
 ![Windows](https://img.shields.io/badge/Windows-0078D6?style=for-the-badge&logo=windows&logoColor=white)
+
 ## Author
 
 - [@alexmmych](https://github.com/alexmmych)
