@@ -6,6 +6,7 @@ import 'dart:io';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_svg/flutter_svg.dart';
 import 'package:googleapis/calendar/v3.dart' as calendar_api;
 import 'package:http/io_client.dart' show IOClient, IOStreamedResponse;
 import 'package:http/http.dart' as http;
@@ -19,6 +20,7 @@ import 'package:oauth2/oauth2.dart' as oauth2;
 
 import 'package:provider/provider.dart';
 import '../../providers/moving_provider/settings_provider.dart';
+import '../../providers/theme_provider.dart';
 
 class GoogleCalendar extends StatefulWidget {
   const GoogleCalendar({super.key});
@@ -213,6 +215,7 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
   // The SignInDialog was created using ChatGPT
   void _showSignInDialog() {
     if (!_isDialogShown) {
+      final themeProvider = Provider.of<ThemeProvider>(context);
       _isDialogShown = true;
       WidgetsBinding.instance.addPostFrameCallback((_) {
         setState(() {
@@ -227,8 +230,19 @@ class _GoogleCalendarState extends State<GoogleCalendar> {
               content: const Text(
                   "Please sign in with Google to view your calendar."),
               actions: <Widget>[
-                TextButton(
-                  child: const Text("Sign In"),
+                TextButton.icon(
+                  style: ButtonStyle(
+                      foregroundColor: WidgetStatePropertyAll(
+                          themeProvider.getOppositeColor(context))),
+                  label: const Text("Sign in with Google",
+                      style: TextStyle(
+                        fontFamily: "Roboto Medium",
+                        fontSize: 14.0,
+                      )),
+                  icon: SvgPicture.asset(
+                      'resources/signin-assets/google_logo.svg',
+                      width: 20.0,
+                      height: 20.0),
                   onPressed: () {
                     Navigator.of(context).pop();
                     _handleSignIn();

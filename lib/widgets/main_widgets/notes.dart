@@ -250,7 +250,7 @@ class _NotesState extends State<Notes> {
                                   trailing: const Handle(
                                     delay: Duration(milliseconds: 50),
                                     child: Icon(
-                                      Icons.list,
+                                      CupertinoIcons.line_horizontal_3,
                                       color: Colors.grey,
                                     ),
                                   ),
