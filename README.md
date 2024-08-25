@@ -16,7 +16,7 @@ CS50 2024 Final Project by Alexander Maykl Mychlo
 
 #### What does this software do?
 
-This software has the utility of a calendar, notekeeper and reminder app that is cross-compatible between different Desktop platforms.
+This software has the utility of a calendar and notekeeper app that is cross-compatible between different Desktop platforms.
 
 
 #### Why Flutter
