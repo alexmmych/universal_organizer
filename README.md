@@ -27,6 +27,7 @@ I used Flutter not necessarily because it can also build for mobile because I ca
 ## Screenshots
 
 ![App Screenshot](resources/screenshot.png)
+![App Screenshot](resources/screenshot_01.png)
 
 
 ## Features
@@ -40,6 +41,7 @@ I used Flutter not necessarily because it can also build for mobile because I ca
 ## Acknowledgements
 
  - [Add Google Event Calendar to Flutter Event Calendar (SyncFusion)](https://github.com/SyncfusionExamples/add-google-event-calendar-to-flutter-event-calendar)
+ - [Electronics icons created by xnimrodx - Flaticon](https://www.flaticon.com/free-icons/electronics)
  - [readme.so](https://readme.so/)
 
 
